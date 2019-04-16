@@ -28,7 +28,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/testing';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { BrowserVisibility, BrowserActions } from '@alfresco/adf-testing';
 

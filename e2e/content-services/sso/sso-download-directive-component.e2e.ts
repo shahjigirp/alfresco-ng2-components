@@ -20,7 +20,7 @@ import TestConfig = require('../../test.config');
 import { browser } from 'protractor';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { ApiService, LoginSSOPage } from '@alfresco/adf-testing';
-import { UploadActions } from '../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/testing';
 import { FileModel } from '../../models/ACS/fileModel';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import resources = require('../../util/resources');

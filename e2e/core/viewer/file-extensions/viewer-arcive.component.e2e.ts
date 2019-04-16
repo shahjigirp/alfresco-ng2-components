@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-import TestConfig = require('../../../test.config');
-
+import { TestConfig } from '../../../../e2e/test.config.js';
 import { LoginPage } from '@alfresco/adf-testing';
 import { ViewerPage } from '../../../pages/adf/viewerPage';
 import { ContentServicesPage } from '../../../pages/adf/contentServicesPage';
 
-import CONSTANTS = require('../../../util/constants');
-import resources = require('../../../util/resources');
+import { CONSTANTS } from '../../../util/constants.js';
+import resources = require('../../../util/resources.js');
 import { StringUtil } from '@alfresco/adf-testing';
 
 import { FolderModel } from '../../../models/ACS/folderModel';
 import { AcsUserModel } from '../../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 

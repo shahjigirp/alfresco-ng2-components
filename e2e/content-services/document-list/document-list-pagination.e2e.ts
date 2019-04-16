@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-import { LoginPage } from '@alfresco/adf-testing';
+import { LoginPage, UploadActions } from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { PaginationPage } from '@alfresco/adf-testing';
+import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import { FolderModel } from '../../models/ACS/folderModel';
@@ -26,8 +27,6 @@ import TestConfig = require('../../test.config');
 import { Util } from '../../util/util';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
-import { browser } from 'protractor';
 
 describe('Document List - Pagination', function () {
     const pagination = {
@@ -51,6 +50,7 @@ describe('Document List - Pagination', function () {
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const paginationPage = new PaginationPage();
+    const navigationBarPage = new NavigationBarPage();
 
     const acsUser = new AcsUserModel();
     const newFolderModel = new FolderModel({ 'name': 'newFolder' });
@@ -126,6 +126,8 @@ describe('Document List - Pagination', function () {
         browser.refresh();
         contentServicesPage.waitForTableBody();
         expect(paginationPage.getCurrentItemsPerPage()).toEqual(itemsPerPage.twenty);
+        navigationBarPage.clickLogoutButton();
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
     });
 
     it('[C260069] Should be able to set Items per page to 5', () => {
@@ -177,6 +179,8 @@ describe('Document List - Pagination', function () {
         contentServicesPage.checkAcsContainer();
         contentServicesPage.waitForTableBody();
         expect(paginationPage.getCurrentItemsPerPage()).toEqual(itemsPerPage.five);
+        navigationBarPage.clickLogoutButton();
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
     });
 
     it('[C260067] Should be able to set Items per page to 10', () => {
@@ -208,6 +212,9 @@ describe('Document List - Pagination', function () {
         browser.refresh();
         contentServicesPage.waitForTableBody();
         expect(paginationPage.getCurrentItemsPerPage()).toEqual(itemsPerPage.ten);
+        navigationBarPage.clickLogoutButton();
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
+        currentPage = 1;
     });
 
     it('[C260065] Should be able to set Items per page to 15', () => {

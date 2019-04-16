@@ -16,16 +16,15 @@
  */
 
 import { PermissionsPage } from '../../pages/adf/permissionsPage';
-import { LoginPage } from '@alfresco/adf-testing';
+import { LoginPage, UploadActions } from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { FileModel } from '../../models/ACS/fileModel';
-import { UploadActions } from '../../actions/ACS/upload.actions';
-import { StringUtil, BrowserActions } from '@alfresco/adf-testing';
-import { browser } from 'protractor';
+import { StringUtil } from '@alfresco/adf-testing';
+import { browser, protractor } from 'protractor';
 import { FolderModel } from '../../models/ACS/folderModel';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import { NotificationPage } from '../../pages/adf/notificationPage';

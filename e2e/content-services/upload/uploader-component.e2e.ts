@@ -32,7 +32,7 @@ import { StringUtil } from '@alfresco/adf-testing';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/testing';
 import { DropActions } from '../../actions/drop.actions';
 
 describe('Upload component', () => {

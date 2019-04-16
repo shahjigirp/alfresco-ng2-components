@@ -27,7 +27,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/testing';
 
 import { StringUtil } from '@alfresco/adf-testing';
 import CONSTANTS = require('../../util/constants');

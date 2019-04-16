@@ -23,7 +23,7 @@ import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
+import { UploadActions } from '@alfresco/testing';
 import { FileModel } from '../../models/ACS/fileModel';
 import { StringUtil } from '@alfresco/adf-testing';
 import { Util } from '../../util/util';
