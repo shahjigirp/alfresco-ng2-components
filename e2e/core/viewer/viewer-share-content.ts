@@ -31,7 +31,7 @@ import { FileModel } from '../../models/ACS/fileModel';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { browser } from 'protractor';
 
 describe('Viewer', () => {
@@ -40,7 +40,11 @@ describe('Viewer', () => {
     const navigationBarPage = new NavigationBarPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
     let pngFileUploaded;
@@ -61,11 +65,6 @@ describe('Viewer', () => {
 
     beforeAll(async (done) => {
 
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
@@ -81,11 +80,11 @@ describe('Viewer', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        pngFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileInfo.location, pngFileInfo.name, site.entry.guid);
+        pngFileUploaded = await uploadActions.uploadFile(pngFileInfo.location, pngFileInfo.name, site.entry.guid);
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        wordFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, wordFileInfo.location, wordFileInfo.name, '-my-');
+        wordFileUploaded = await uploadActions.uploadFile(wordFileInfo.location, wordFileInfo.name, '-my-');
 
         pngFileShared = await this.alfrescoJsApi.core.sharedlinksApi.addSharedLink({ 'nodeId': pngFileUploaded.entry.id });
 
@@ -94,7 +93,7 @@ describe('Viewer', () => {
 
     afterAll(async (done) => {
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, wordFileUploaded.entry.id);
+        await uploadActions.deleteFileOrFolder(wordFileUploaded.entry.id);
         done();
     });
 

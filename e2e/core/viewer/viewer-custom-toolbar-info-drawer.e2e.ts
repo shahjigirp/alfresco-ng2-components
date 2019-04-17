@@ -27,14 +27,18 @@ import { FileModel } from '../../models/ACS/fileModel';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 
     const viewerPage = new ViewerPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     const acsUser = new AcsUserModel();
     let txtFileUploaded;
 
@@ -45,17 +49,12 @@ describe('Viewer', () => {
 
     beforeAll(async (done) => {
 
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        txtFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, txtFileInfo.location, txtFileInfo.name, '-my-');
+        txtFileUploaded = await uploadActions.uploadFile(txtFileInfo.location, txtFileInfo.name, '-my-');
 
         await loginPage.loginToContentServicesUsingUserModel(acsUser);
 
@@ -63,7 +62,7 @@ describe('Viewer', () => {
     });
 
     afterAll(async (done) => {
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, txtFileUploaded.entry.id);
+        await uploadActions.deleteFileOrFolder(txtFileUploaded.entry.id);
         done();
     });
 

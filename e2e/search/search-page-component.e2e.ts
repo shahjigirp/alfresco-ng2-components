@@ -33,7 +33,7 @@ import resources = require('../util/resources');
 import { StringUtil } from '@alfresco/adf-testing';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Search component - Search Page', () => {
     const search = {
@@ -73,28 +73,25 @@ describe('Search component - Search Page', () => {
             'name': search.active.firstFile,
             'location': resources.Files.ADF_DOCUMENTS.TXT.file_location
         });
-
-        const uploadActions = new UploadActions();
-
-        this.alfrescoJsApi = new AlfrescoApi({
+        const alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
-
+        const uploadActions = new UploadActions(alfrescoJsApi);
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        await uploadActions.createFolder(this.alfrescoJsApi, emptyFolderModel.name, '-my-');
-        const newFolderModelUploaded = await uploadActions.createFolder(this.alfrescoJsApi, newFolderModel.name, '-my-');
+        await uploadActions.createFolder(emptyFolderModel.name, '-my-');
+        const newFolderModelUploaded = await uploadActions.createFolder(newFolderModel.name, '-my-');
 
-        await uploadActions.createEmptyFiles(this.alfrescoJsApi, fileNames, newFolderModelUploaded.entry.id);
+        await uploadActions.createEmptyFiles(fileNames, newFolderModelUploaded.entry.id);
 
-        await uploadActions.uploadFile(this.alfrescoJsApi, firstFileModel.location, firstFileModel.name, '-my-');
+        await uploadActions.uploadFile(firstFileModel.location, firstFileModel.name, '-my-');
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
-        await uploadActions.createEmptyFiles(this.alfrescoJsApi, adminFileNames, newFolderModelUploaded.entry.id);
+        await uploadActions.createEmptyFiles(adminFileNames, newFolderModelUploaded.entry.id);
 
         browser.driver.sleep(15000);
 

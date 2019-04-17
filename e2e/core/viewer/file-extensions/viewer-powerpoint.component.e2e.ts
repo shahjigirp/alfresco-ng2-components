@@ -36,7 +36,13 @@ describe('Viewer', () => {
     const viewerPage = new ViewerPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
 
@@ -46,12 +52,6 @@ describe('Viewer', () => {
     });
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
@@ -76,20 +76,18 @@ describe('Viewer', () => {
         let pptFolderUploaded;
 
         beforeAll(async (done) => {
-            pptFolderUploaded = await uploadActions.createFolder(this.alfrescoJsApi, pptFolderInfo.name, '-my-');
+            pptFolderUploaded = await uploadActions.createFolder(pptFolderInfo.name, '-my-');
 
-            uploadedPpt = await uploadActions.uploadFolder(this.alfrescoJsApi, pptFolderInfo.location, pptFolderUploaded.entry.id);
+            uploadedPpt = await uploadActions.uploadFolder(pptFolderInfo.location, pptFolderUploaded.entry.id);
 
-            await loginPage.loginToContentServicesUsingUserModel(acsUser);
+            loginPage.loginToContentServicesUsingUserModel(acsUser);
             contentServicesPage.goToDocumentList();
-
-            browser.driver.sleep(15000);
 
             done();
         });
 
         afterAll(async (done) => {
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, pptFolderUploaded.entry.id);
+            await uploadActions.deleteFileOrFolder(pptFolderUploaded.entry.id);
             done();
         });
 
@@ -99,7 +97,7 @@ describe('Viewer', () => {
             uploadedPpt.forEach((currentFile) => {
                 if (currentFile.entry.name !== '.DS_Store') {
                     contentServicesPage.doubleClickRow(currentFile.entry.name);
-                    viewerPage.checkFileIsLoaded(currentFile.entry.name);
+                    viewerPage.checkFileIsLoaded();
                     viewerPage.clickCloseButton();
                 }
             });

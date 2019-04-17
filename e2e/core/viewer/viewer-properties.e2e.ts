@@ -29,7 +29,7 @@ import { FileModel } from '../../models/ACS/fileModel';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer - properties', () => {
 
@@ -49,14 +49,13 @@ describe('Viewer - properties', () => {
         'name': 'fileForOverlay.png',
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     beforeAll(async (done) => {
-        const uploadActions = new UploadActions();
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -64,10 +63,10 @@ describe('Viewer - properties', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        let pngFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, pngFile.location, pngFile.name, '-my-');
+        let pngFileUploaded = await uploadActions.uploadFile(pngFile.location, pngFile.name, '-my-');
         Object.assign(pngFile, pngFileUploaded.entry);
 
-        pngFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, fileForOverlay.location, fileForOverlay.name, '-my-');
+        pngFileUploaded = await uploadActions.uploadFile(fileForOverlay.location, fileForOverlay.name, '-my-');
         Object.assign(fileForOverlay, pngFileUploaded.entry);
 
         await loginPage.loginToContentServicesUsingUserModel(acsUser);
@@ -85,9 +84,7 @@ describe('Viewer - properties', () => {
     });
 
     afterAll(async (done) => {
-        const uploadActions = new UploadActions();
-
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, pngFile.getId());
+        await uploadActions.deleteFileOrFolder(pngFile.getId());
 
         done();
     });

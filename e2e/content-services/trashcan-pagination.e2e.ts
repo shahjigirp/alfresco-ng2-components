@@ -28,7 +28,7 @@ import TestConfig = require('../test.config');
 import { Util } from '../util/util';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { browser } from 'protractor';
 
 describe('Trashcan - Pagination', () => {
@@ -59,14 +59,13 @@ describe('Trashcan - Pagination', () => {
     const nrOfFiles = 20;
 
     beforeAll(async (done) => {
-        const uploadActions = new UploadActions();
-
-        const fileNames = Util.generateSequenceFiles(10, nrOfFiles + 9, pagination.base, pagination.extension);
-
-        this.alfrescoJsApi = new AlfrescoApi({
+        const alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
+        const uploadActions = new UploadActions(alfrescoJsApi);
+
+        const fileNames = Util.generateSequenceFiles(10, nrOfFiles + 9, pagination.base, pagination.extension);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -74,9 +73,9 @@ describe('Trashcan - Pagination', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        const folderUploadedModel = await uploadActions.createFolder(this.alfrescoJsApi, newFolderModel.name, '-my-');
+        const folderUploadedModel = await uploadActions.createFolder(newFolderModel.name, '-my-');
 
-        const emptyFiles = await uploadActions.createEmptyFiles(this.alfrescoJsApi, fileNames, folderUploadedModel.entry.id);
+        const emptyFiles = await uploadActions.createEmptyFiles(fileNames, folderUploadedModel.entry.id);
         await emptyFiles.list.entries.forEach(async (node) => {
             await this.alfrescoJsApi.node.deleteNode(node.entry.id).then(() => {
             }, () => {

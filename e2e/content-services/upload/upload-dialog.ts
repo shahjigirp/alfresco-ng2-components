@@ -27,7 +27,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Upload component', () => {
 
@@ -36,7 +36,11 @@ describe('Upload component', () => {
     const uploadToggles = new UploadToggles();
     const loginPage = new LoginPage();
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     const firstPdfFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PDF_B.file_name,
@@ -62,10 +66,6 @@ describe('Upload component', () => {
     const filesName = [pdfFileModel.name, docxFileModel.name, pngFileModel.name, firstPdfFileModel.name];
 
     beforeAll(async (done) => {
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -77,7 +77,7 @@ describe('Upload component', () => {
 
         contentServicesPage.goToDocumentList();
 
-        const pdfUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, firstPdfFileModel.location, firstPdfFileModel.name, '-my-');
+        const pdfUploadedFile = await uploadActions.uploadFile(firstPdfFileModel.location, firstPdfFileModel.name, '-my-');
 
         Object.assign(firstPdfFileModel, pdfUploadedFile.entry);
 
@@ -94,7 +94,7 @@ describe('Upload component', () => {
         nodesPromise.forEach(async (currentNodePromise) => {
             await currentNodePromise.then(async (currentNode) => {
                 if (currentNode && currentNode !== 'Node id') {
-                    await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, currentNode);
+                    await uploadActions.deleteFileOrFolder(currentNode);
                 }
             });
         });

@@ -26,11 +26,15 @@ import { FileModel } from '../../models/ACS/fileModel';
 import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { browser } from 'protractor';
 
 describe('Unshare file', () => {
 
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const contentListPage = contentServicesPage.getDocumentList();
@@ -40,7 +44,7 @@ describe('Unshare file', () => {
     const siteName = `PRIVATE-TEST-SITE-${StringUtil.generateRandomString(5)}`;
 
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let nodeBody;
     let nodeId;
     let testSite;
@@ -69,11 +73,6 @@ describe('Unshare file', () => {
             }
         };
 
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         testSite = await this.alfrescoJsApi.core.sitesApi.createSite(site);
@@ -96,7 +95,7 @@ describe('Unshare file', () => {
         await this.alfrescoJsApi.core.sharedlinksApi.addSharedLink({ nodeId: testFile1Id });
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        const pngUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileModel.location, pngFileModel.name, '-my-');
+        const pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, '-my-');
         nodeId = pngUploadedFile.entry.id;
 
         await loginPage.loginToContentServicesUsingUserModel(acsUser);
@@ -112,7 +111,7 @@ describe('Unshare file', () => {
 
     describe('with permission', () => {
         afterAll(async (done) => {
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, nodeId);
+            await uploadActions.deleteFileOrFolder(nodeId);
             done();
         });
 

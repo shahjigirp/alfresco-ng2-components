@@ -28,7 +28,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { BrowserVisibility, BrowserActions } from '@alfresco/adf-testing';
 
@@ -53,12 +53,12 @@ describe('Version Properties', () => {
 
     beforeAll(async (done) => {
 
-        const uploadActions = new UploadActions();
-
-        this.alfrescoJsApi = new AlfrescoApi({
+        const alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
+
+        const uploadActions = new UploadActions(alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -66,7 +66,7 @@ describe('Version Properties', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        const txtUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, txtFileModel.location, txtFileModel.name, '-my-');
+        const txtUploadedFile = await uploadActions.uploadFile(txtFileModel.location, txtFileModel.name, '-my-');
 
         Object.assign(txtFileModel, txtUploadedFile.entry);
 

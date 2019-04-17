@@ -24,7 +24,7 @@ import { AcsUserModel } from '../models/ACS/acsUserModel';
 import TestConfig = require('../test.config');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Tree View Component', () => {
 
@@ -33,7 +33,11 @@ describe('Tree View Component', () => {
     const treeViewPage = new TreeViewPage();
 
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     let treeFolder, secondTreeFolder, thirdTreeFolder;
 
@@ -47,35 +51,18 @@ describe('Tree View Component', () => {
 
     beforeAll(async (done) => {
 
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        treeFolder = await this.alfrescoJsApi.nodes.addNode(nodeNames.parentFolder, {
-            name: nodeNames.folder,
-            nodeType: 'cm:folder'
-        });
-        secondTreeFolder = await this.alfrescoJsApi.nodes.addNode(nodeNames.parentFolder, {
-            name: nodeNames.secondFolder,
-            nodeType: 'cm:folder'
-        });
-        thirdTreeFolder = await this.alfrescoJsApi.nodes.addNode(secondTreeFolder.entry.id, {
-            name: nodeNames.thirdFolder,
-            nodeType: 'cm:folder'
-        });
-        await this.alfrescoJsApi.nodes.addNode(thirdTreeFolder.entry.id, {
-            name: nodeNames.document,
-            nodeType: 'cm:content'
-        });
+        treeFolder = await this.alfrescoJsApi.nodes.addNode(nodeNames.parentFolder, { name: nodeNames.folder, nodeType: 'cm:folder' });
+        secondTreeFolder = await this.alfrescoJsApi.nodes.addNode(nodeNames.parentFolder, { name: nodeNames.secondFolder, nodeType: 'cm:folder' });
+        thirdTreeFolder = await this.alfrescoJsApi.nodes.addNode(secondTreeFolder.entry.id, { name: nodeNames.thirdFolder, nodeType: 'cm:folder' });
+        await this.alfrescoJsApi.nodes.addNode(thirdTreeFolder.entry.id, { name: nodeNames.document, nodeType: 'cm:content' });
 
-        await loginPage.loginToContentServicesUsingUserModel(acsUser);
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
 
         navigationBarPage.clickTreeViewButton();
 
@@ -83,13 +70,11 @@ describe('Tree View Component', () => {
     });
 
     afterAll(async (done) => {
-        try {
-            await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+        await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, treeFolder.entry.id);
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, secondTreeFolder.entry.id);
-        } catch (error) {
-        }
+        await uploadActions.deleteFileOrFolder(treeFolder.entry.id);
+        await uploadActions.deleteFileOrFolder(secondTreeFolder.entry.id);
+
         done();
     });
 

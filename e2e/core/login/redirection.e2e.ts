@@ -28,7 +28,7 @@ import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 
 import { StringUtil } from '@alfresco/adf-testing';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { LogoutPage } from '../../pages/adf/demo-shell/logoutPage';
 
 describe('Login component - Redirect', () => {
@@ -45,15 +45,17 @@ describe('Login component - Redirect', () => {
         'password': TestConfig.adf.adminPassword
     });
     let uploadedFolder;
-    const uploadActions = new UploadActions();
+
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url,
+        hostBpm: TestConfig.adf.url
+    });
+
+    const uploadActions = new UploadActions(alfrescoJsApi);
     const logoutPage = new LogoutPage();
 
     beforeAll(async (done) => {
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url,
-            hostBpm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -62,7 +64,7 @@ describe('Login component - Redirect', () => {
 
         await this.alfrescoJsApi.login(user.id, user.password);
 
-        uploadedFolder = await uploadActions.createFolder(this.alfrescoJsApi, 'protecteFolder' + StringUtil.generateRandomString(), '-my-');
+        uploadedFolder = await uploadActions.createFolder('protecteFolder' + StringUtil.generateRandomString(), '-my-');
 
         done();
     });

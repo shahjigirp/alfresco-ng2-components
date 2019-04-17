@@ -31,7 +31,7 @@ import { FileModel } from '../../models/ACS/fileModel';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 
@@ -39,7 +39,11 @@ describe('Viewer', () => {
     const navigationBarPage = new NavigationBarPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
     const monacoExtensionPage = new MonacoExtensionPage();
@@ -51,12 +55,6 @@ describe('Viewer', () => {
     });
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
@@ -72,7 +70,7 @@ describe('Viewer', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        jsFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, jsFileInfo.location, jsFileInfo.name, '-my-');
+        jsFileUploaded = await uploadActions.uploadFile(jsFileInfo.location, jsFileInfo.name, '-my-');
 
         await loginPage.loginToContentServicesUsingUserModel(acsUser);
 
@@ -81,7 +79,7 @@ describe('Viewer', () => {
 
     afterAll(async (done) => {
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, jsFileUploaded.entry.id);
+        await uploadActions.deleteFileOrFolder(jsFileUploaded.entry.id);
         done();
     });
 

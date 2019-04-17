@@ -32,7 +32,7 @@ import { Util } from '../util/util';
 import { StringUtil, LocalStorageUtil, BrowserActions } from '@alfresco/adf-testing';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { NavigationBarPage } from '../pages/adf/navigationBarPage';
 import { SearchConfiguration } from './search.config';
 
@@ -55,7 +55,11 @@ describe('Search component - Search Bar', () => {
     const filePreviewPage = new FilePreviewPage();
 
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     const filename = StringUtil.generateRandomString(16);
     const firstFolderName = StringUtil.generateRandomString(16);
@@ -82,17 +86,11 @@ describe('Search component - Search Bar', () => {
     let fileHighlightUploaded;
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        const firstFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, firstFileModel.location, firstFileModel.name, '-my-');
+        const firstFileUploaded = await uploadActions.uploadFile(firstFileModel.location, firstFileModel.name, '-my-');
         Object.assign(firstFileModel, firstFileUploaded.entry);
 
         fileHighlightUploaded = await this.alfrescoJsApi.nodes.addNode('-my-', {
@@ -106,9 +104,9 @@ describe('Search component - Search Bar', () => {
 
         filesToDelete.push(fileHighlightUploaded);
         filesToDelete.push(firstFileUploaded);
-        filesToDelete.push(await uploadActions.createFolder(this.alfrescoJsApi, firstFolderModel.name, '-my-'));
-        filesToDelete.push(await uploadActions.createFolder(this.alfrescoJsApi, secondFolder.name, '-my-'));
-        filesToDelete.push(await uploadActions.createFolder(this.alfrescoJsApi, thirdFolder.name, '-my-'));
+        filesToDelete.push(await uploadActions.createFolder(firstFolderModel.name, '-my-'));
+        filesToDelete.push(await uploadActions.createFolder(secondFolder.name, '-my-'));
+        filesToDelete.push(await uploadActions.createFolder(thirdFolder.name, '-my-'));
 
         await browser.driver.sleep(15000); // wait search index previous file/folder uploaded
 
@@ -120,7 +118,7 @@ describe('Search component - Search Bar', () => {
     afterAll(async (done) => {
 
         filesToDelete.forEach(async (currentNode) => {
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, currentNode.entry.id);
+            await uploadActions.deleteFileOrFolder(currentNode.entry.id);
 
         });
 

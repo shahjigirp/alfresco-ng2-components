@@ -26,7 +26,7 @@ import { NodeActions } from '../../actions/ACS/node.actions';
 import TestConfig = require('../../test.config');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import { browser } from 'protractor';
 import resources = require('../../util/resources');
@@ -57,26 +57,24 @@ describe('Search Sorting Picker', () => {
     };
 
     let pngA, pngD;
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     const search = '_png_file.png';
     let jsonFile;
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        pngA = await uploadActions.uploadFile(this.alfrescoJsApi, pngAModel.location, pngAModel.name, '-my-');
+        pngA = await uploadActions.uploadFile(pngAModel.location, pngAModel.name, '-my-');
         await browser.driver.sleep(3000);
-        pngD = await uploadActions.uploadFile(this.alfrescoJsApi, pngDModel.location, pngDModel.name, '-my-');
+        pngD = await uploadActions.uploadFile(pngDModel.location, pngDModel.name, '-my-');
         await browser.driver.sleep(12000);
 
         loginPage.loginToContentServices(acsUser.id, acsUser.password);
@@ -85,8 +83,8 @@ describe('Search Sorting Picker', () => {
     });
 
     afterAll(async (done) => {
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, pngA.entry.id);
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, pngD.entry.id);
+        await uploadActions.deleteFileOrFolder(pngA.entry.id);
+        await uploadActions.deleteFileOrFolder(pngD.entry.id);
         done();
     });
 

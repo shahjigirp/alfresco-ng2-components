@@ -27,7 +27,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 import { StringUtil } from '@alfresco/adf-testing';
 import CONSTANTS = require('../../util/constants');
@@ -64,12 +64,12 @@ describe('permissions', () => {
 
     beforeAll(async (done) => {
 
-        const uploadActions = new UploadActions();
-
-        this.alfrescoJsApi = new AlfrescoApi({
+        const alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
+
+        const uploadActions = new UploadActions(alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -97,7 +97,7 @@ describe('permissions', () => {
             role: CONSTANTS.CS_USER_ROLES.CONTRIBUTOR
         });
 
-        await uploadActions.uploadFile(this.alfrescoJsApi, pngFileModel.location, pngFileModel.name, site.entry.guid);
+        await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, site.entry.guid);
 
         done();
     });

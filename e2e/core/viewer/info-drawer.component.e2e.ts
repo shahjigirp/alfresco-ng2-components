@@ -30,7 +30,7 @@ import { FileModel } from '../../models/ACS/fileModel';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Info Drawer', () => {
 
@@ -38,7 +38,11 @@ describe('Info Drawer', () => {
     const navigationBarPage = new NavigationBarPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
     let pngFileUploaded;
@@ -49,12 +53,6 @@ describe('Info Drawer', () => {
     });
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
@@ -70,13 +68,13 @@ describe('Info Drawer', () => {
 
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
-        pngFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileInfo.location, pngFileInfo.name, site.entry.guid);
+        pngFileUploaded = await uploadActions.uploadFile(pngFileInfo.location, pngFileInfo.name, site.entry.guid);
         done();
     });
 
     afterAll(async (done) => {
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
-        await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, pngFileUploaded.entry.id);
+        await uploadActions.deleteFileOrFolder(pngFileUploaded.entry.id);
         done();
     });
 

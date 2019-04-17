@@ -31,7 +31,7 @@ import TestConfig = require('../test.config');
 import resources = require('../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Lock File', () => {
 
@@ -42,7 +42,11 @@ describe('Lock File', () => {
 
     const adminUser = new AcsUserModel();
     const managerUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
@@ -57,10 +61,6 @@ describe('Lock File', () => {
     let nodeId, site, documentLibrary, lockedFileNodeId;
 
     beforeAll(async (done) => {
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -90,7 +90,7 @@ describe('Lock File', () => {
     describe('Lock file interaction with the UI', () => {
 
         beforeAll(async (done) => {
-            const pngLockedUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileToLock.location, pngFileToLock.name, documentLibrary);
+            const pngLockedUploadedFile = await uploadActions.uploadFile(pngFileToLock.location, pngFileToLock.name, documentLibrary);
 
             lockedFileNodeId = pngLockedUploadedFile.entry.id;
 
@@ -98,42 +98,34 @@ describe('Lock File', () => {
         });
 
         beforeEach(async (done) => {
-            try {
-                const pngUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileModel.location, pngFileModel.name, documentLibrary);
-                nodeId = pngUploadedFile.entry.id;
-                await loginPage.loginToContentServicesUsingUserModel(adminUser);
-                await navigationBarPage.openContentServicesFolder(documentLibrary);
+            const pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, documentLibrary);
 
-                contentServices.waitForTableBody();
-            } catch (error) {
+            nodeId = pngUploadedFile.entry.id;
 
-            }
+            loginPage.loginToContentServicesUsingUserModel(adminUser);
+
+            await navigationBarPage.openContentServicesFolder(documentLibrary);
+
+            contentServices.waitForTableBody();
+
             done();
         });
 
         afterEach(async (done) => {
-            try {
-                await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
+            await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
 
-                await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, nodeId);
+            await uploadActions.deleteFileOrFolder(nodeId);
 
-            } catch (error) {
-
-            }
             done();
         });
 
         afterAll(async (done) => {
-            try {
-                await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
+            await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
 
-                await this.alfrescoJsApi.core.nodesApi.unlockNode(lockedFileNodeId);
+            await this.alfrescoJsApi.core.nodesApi.unlockNode(lockedFileNodeId);
 
-                await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, lockedFileNodeId);
+            await uploadActions.deleteFileOrFolder(lockedFileNodeId);
 
-            } catch (error) {
-
-            }
             done();
         });
 
@@ -185,13 +177,13 @@ describe('Lock File', () => {
     describe('Locked file without owner permissions', () => {
 
         beforeEach(async (done) => {
-            const pngUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileModel.location, pngFileModel.name, documentLibrary);
+            const pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, documentLibrary);
 
             nodeId = pngUploadedFile.entry.id;
 
-            await loginPage.loginToContentServicesUsingUserModel(managerUser);
+            loginPage.loginToContentServicesUsingUserModel(managerUser);
 
-            await navigationBarPage.openContentServicesFolder(documentLibrary);
+            navigationBarPage.openContentServicesFolder(documentLibrary);
 
             done();
         });
@@ -199,21 +191,19 @@ describe('Lock File', () => {
         afterEach(async (done) => {
             await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
 
-            try {
-                await this.alfrescoJsApi.core.nodesApi.unlockNode(nodeId);
-                await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, nodeId);
-            } catch (error) {
-            }
+            await this.alfrescoJsApi.core.nodesApi.unlockNode(nodeId);
+
+            await uploadActions.deleteFileOrFolder(nodeId);
 
             done();
         });
 
         it('[C286610] Should not be able to delete a locked file', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickSaveButton();
 
             try {
                 await this.alfrescoJsApi.core.nodesApi.deleteNode(nodeId);
@@ -224,11 +214,11 @@ describe('Lock File', () => {
         });
 
         it('[C286611] Should not be able to rename a locked file', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickSaveButton();
 
             try {
                 await this.alfrescoJsApi.core.nodesApi.updateNode(nodeId, { name: 'My new name' });
@@ -240,11 +230,11 @@ describe('Lock File', () => {
         });
 
         it('[C286612] Should not be able to move a locked file', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickSaveButton();
 
             try {
                 await this.alfrescoJsApi.core.nodesApi.moveNode(nodeId, { targetParentId: '-my-' });
@@ -255,11 +245,11 @@ describe('Lock File', () => {
         });
 
         it('[C286613] Should not be able to update a new version on a locked file', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickSaveButton();
 
             try {
                 await this.alfrescoJsApi.core.nodesApi.updateNodeContent(nodeId, 'NEW FILE CONTENT');
@@ -276,85 +266,73 @@ describe('Lock File', () => {
         let pngFileToBeLocked;
 
         beforeAll(async (done) => {
-            try {
-                pngFileToBeLocked = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileToLock.location, pngFileToLock.name, documentLibrary);
-                lockedFileNodeId = pngFileToBeLocked.entry.id;
-            } catch (error) {
-            }
+            pngFileToBeLocked = await uploadActions.uploadFile(pngFileToLock.location, pngFileToLock.name, documentLibrary);
+
+            lockedFileNodeId = pngFileToBeLocked.entry.id;
+
             done();
         });
 
         beforeEach(async (done) => {
-            try {
-                const pngUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, pngFileModel.location, pngFileModel.name, documentLibrary);
-                nodeId = pngUploadedFile.entry.id;
-                await loginPage.loginToContentServicesUsingUserModel(adminUser);
-                navigationBarPage.openContentServicesFolder(documentLibrary);
-            } catch (error) {
-            }
+            const pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, documentLibrary);
+
+            nodeId = pngUploadedFile.entry.id;
+
+            loginPage.loginToContentServicesUsingUserModel(adminUser);
+
+            navigationBarPage.openContentServicesFolder(documentLibrary);
+
             done();
         });
 
         afterEach(async (done) => {
             await this.alfrescoJsApi.login(adminUser.id, adminUser.password);
 
-            try {
-                await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, nodeId);
-            } catch (error) {
-            }
+            await uploadActions.deleteFileOrFolder(nodeId);
 
             done();
 
         });
 
         it('[C286614] Owner of the locked file should be able to rename if Allow owner to modify is checked', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickAllowOwnerCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickAllowOwnerCheckbox();
+            await lockFilePage.clickSaveButton();
 
-            try {
-                const response = await this.alfrescoJsApi.core.nodesApi.updateNode(nodeId, { name: 'My new name' });
-                expect(response.entry.name).toEqual('My new name');
-            } catch (error) {
-            }
+            const response = await this.alfrescoJsApi.core.nodesApi.updateNode(nodeId, { name: 'My new name' });
 
+            expect(response.entry.name).toEqual('My new name');
         });
 
         it('[C286615] Owner of the locked file should be able to update a new version if Allow owner to modify is checked', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickAllowOwnerCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickAllowOwnerCheckbox();
+            await lockFilePage.clickSaveButton();
 
-            try {
-                const response = await this.alfrescoJsApi.core.nodesApi.updateNodeContent(nodeId, 'NEW FILE CONTENT');
-                expect(response.entry.modifiedAt).toBeGreaterThan(response.entry.createdAt);
-            } catch (error) {
-            }
+            const response = await this.alfrescoJsApi.core.nodesApi.updateNodeContent(nodeId, 'NEW FILE CONTENT');
 
+            expect(response.entry.modifiedAt).toBeGreaterThan(response.entry.createdAt);
         });
 
         it('[C286616] Owner of the locked file should be able to move if Allow owner to modify is checked', async () => {
-            contentServices.lockContent(pngFileModel.name);
+            await contentServices.lockContent(pngFileModel.name);
 
-            lockFilePage.checkLockFileCheckboxIsDisplayed();
-            lockFilePage.clickLockFileCheckbox();
-            lockFilePage.clickAllowOwnerCheckbox();
-            lockFilePage.clickSaveButton();
+            await lockFilePage.checkLockFileCheckboxIsDisplayed();
+            await lockFilePage.clickLockFileCheckbox();
+            await lockFilePage.clickAllowOwnerCheckbox();
+            await lockFilePage.clickSaveButton();
 
-            try {
-                await this.alfrescoJsApi.core.nodesApi.moveNode(nodeId, { targetParentId: '-my-' });
+            await this.alfrescoJsApi.core.nodesApi.moveNode(nodeId, { targetParentId: '-my-' });
 
-                const movedFile = await this.alfrescoJsApi.core.nodesApi.getNode(nodeId);
+            const movedFile = await this.alfrescoJsApi.core.nodesApi.getNode(nodeId);
 
-                expect(movedFile.entry.parentId).not.toEqual(documentLibrary);
-            } catch (error) {
-            }
+            expect(movedFile.entry.parentId).not.toEqual(documentLibrary);
 
         });
 

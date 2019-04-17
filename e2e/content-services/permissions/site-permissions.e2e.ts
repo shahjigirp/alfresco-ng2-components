@@ -23,7 +23,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { FileModel } from '../../models/ACS/fileModel';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { StringUtil } from '@alfresco/adf-testing';
 import { browser } from 'protractor';
 import { ViewerPage } from '../../pages/adf/viewerPage';
@@ -35,10 +35,14 @@ import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 
 describe('Permissions Component', function () {
 
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const permissionsPage = new PermissionsPage();
-    const uploadActions = new UploadActions();
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     const contentList = contentServicesPage.getDocumentList();
 
@@ -65,11 +69,6 @@ describe('Permissions Component', function () {
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
-    });
-
-    const alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
     });
 
     let siteFolder, privateSiteFile;
@@ -131,9 +130,9 @@ describe('Permissions Component', function () {
             role: CONSTANTS.CS_USER_ROLES.MANAGER
         });
 
-        siteFolder = await uploadActions.createFolder(alfrescoJsApi, folderName, publicSite.entry.guid);
+        siteFolder = await uploadActions.createFolder(folderName, publicSite.entry.guid);
 
-        privateSiteFile = await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'privateSite' + fileModel.name, privateSite.entry.guid);
+        privateSiteFile = await uploadActions.uploadFile(fileModel.location, 'privateSite' + fileModel.name, privateSite.entry.guid);
 
         await alfrescoJsApi.core.nodesApi.updateNode(privateSiteFile.entry.id,
             {
@@ -146,8 +145,10 @@ describe('Permissions Component', function () {
                 }
             });
 
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'Site' + fileModel.name, siteFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'Site' + fileModel.name, siteFolder.entry.id);
+
         done();
+
     });
 
     afterAll(async (done) => {

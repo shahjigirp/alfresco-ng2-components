@@ -29,16 +29,20 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Upload component', () => {
 
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
     const contentServicesPage = new ContentServicesPage();
     const uploadDialog = new UploadDialog();
     const uploadToggles = new UploadToggles();
     const loginPage = new LoginPage();
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions();
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     const firstPdfFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PDF_B.file_name,
@@ -54,10 +58,6 @@ describe('Upload component', () => {
     });
 
     beforeAll(async (done) => {
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -69,7 +69,7 @@ describe('Upload component', () => {
 
         contentServicesPage.goToDocumentList();
 
-        const pdfUploadedFile = await uploadActions.uploadFile(this.alfrescoJsApi, firstPdfFileModel.location, firstPdfFileModel.name, '-my-');
+        const pdfUploadedFile = await uploadActions.uploadFile(firstPdfFileModel.location, firstPdfFileModel.name, '-my-');
 
         Object.assign(firstPdfFileModel, pdfUploadedFile.entry);
 

@@ -31,7 +31,7 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 import { NodeActions } from '../../actions/ACS/node.actions';
 
 import { StringUtil } from '@alfresco/adf-testing';
@@ -69,15 +69,14 @@ describe('Version component permissions', () => {
         'location': resources.Files.ADF_DOCUMENTS.PNG_D.file_location
     });
 
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
+    const nodeActions = new NodeActions();
+
     beforeAll(async (done) => {
-
-        const uploadActions = new UploadActions();
-        const nodeActions = new NodeActions();
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -118,14 +117,14 @@ describe('Version component permissions', () => {
             role: CONSTANTS.CS_USER_ROLES.MANAGER
         });
 
-        const lockFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, lockFileModel.location, lockFileModel.name, site.entry.guid);
+        const lockFileUploaded = await uploadActions.uploadFile(lockFileModel.location, lockFileModel.name, site.entry.guid);
         Object.assign(lockFileModel, lockFileUploaded.entry);
 
         nodeActions.lockNode(this.alfrescoJsApi, lockFileModel.id);
 
         await this.alfrescoJsApi.login(fileCreatorUser.id, fileCreatorUser.password);
 
-        await uploadActions.uploadFile(this.alfrescoJsApi, differentCreatorFile.location, differentCreatorFile.name, site.entry.guid);
+        await uploadActions.uploadFile(differentCreatorFile.location, differentCreatorFile.name, site.entry.guid);
 
         done();
     });
@@ -138,11 +137,9 @@ describe('Version component permissions', () => {
         });
 
         beforeAll(async (done) => {
-            const uploadActions = new UploadActions();
-
             await this.alfrescoJsApi.login(managerUser.id, managerUser.password);
 
-            const sameCreatorFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
+            const sameCreatorFileUploaded = await uploadActions.uploadFile(sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
             Object.assign(sameCreatorFile, sameCreatorFileUploaded.entry);
 
             await loginPage.loginToContentServicesUsingUserModel(managerUser);
@@ -216,11 +213,9 @@ describe('Version component permissions', () => {
         });
 
         beforeAll(async (done) => {
-            const uploadActions = new UploadActions();
-
             await this.alfrescoJsApi.login(contributorUser.id, contributorUser.password);
 
-            const sameCreatorFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
+            const sameCreatorFileUploaded = await uploadActions.uploadFile(sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
             Object.assign(sameCreatorFile, sameCreatorFileUploaded.entry);
 
             await loginPage.loginToContentServicesUsingUserModel(contributorUser);
@@ -276,11 +271,9 @@ describe('Version component permissions', () => {
         });
 
         beforeAll(async (done) => {
-            const uploadActions = new UploadActions();
-
             await this.alfrescoJsApi.login(collaboratorUser.id, collaboratorUser.password);
 
-            const sameCreatorFileUploaded = await uploadActions.uploadFile(this.alfrescoJsApi, sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
+            const sameCreatorFileUploaded = await uploadActions.uploadFile(sameCreatorFile.location, sameCreatorFile.name, site.entry.guid);
             Object.assign(sameCreatorFile, sameCreatorFileUploaded.entry);
 
             await loginPage.loginToContentServicesUsingUserModel(collaboratorUser);

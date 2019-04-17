@@ -29,14 +29,18 @@ import { FolderModel } from '../../../models/ACS/folderModel';
 import { AcsUserModel } from '../../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 
     const viewerPage = new ViewerPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
 
@@ -46,12 +50,6 @@ describe('Viewer', () => {
     });
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
@@ -76,9 +74,9 @@ describe('Viewer', () => {
         let wordFolderUploaded;
 
         beforeAll(async (done) => {
-            wordFolderUploaded = await uploadActions.createFolder(this.alfrescoJsApi, wordFolderInfo.name, '-my-');
+            wordFolderUploaded = await uploadActions.createFolder(wordFolderInfo.name, '-my-');
 
-            uploadedWords = await uploadActions.uploadFolder(this.alfrescoJsApi, wordFolderInfo.location, wordFolderUploaded.entry.id);
+            uploadedWords = await uploadActions.uploadFolder(wordFolderInfo.location, wordFolderUploaded.entry.id);
 
             await loginPage.loginToContentServicesUsingUserModel(acsUser);
             contentServicesPage.goToDocumentList();
@@ -87,7 +85,7 @@ describe('Viewer', () => {
         });
 
         afterAll(async (done) => {
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, wordFolderUploaded.entry.id);
+            await uploadActions.deleteFileOrFolder(wordFolderUploaded.entry.id);
             done();
         });
 

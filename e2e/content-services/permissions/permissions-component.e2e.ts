@@ -34,11 +34,15 @@ import { UploadDialog } from '../../pages/adf/dialog/uploadDialog';
 
 describe('Permissions Component', function () {
 
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const permissionsPage = new PermissionsPage();
     const navigationBarPage = new NavigationBarPage();
-    const uploadActions = new UploadActions();
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     const contentList = contentServicesPage.getDocumentList();
 
@@ -67,11 +71,6 @@ describe('Permissions Component', function () {
         displayName: StringUtil.generateRandomString()
     };
 
-    const alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-
     const roleConsumerFolderModel = new FolderModel({ 'name': 'roleConsumer' + StringUtil.generateRandomString() });
     const roleCoordinatorFolderModel = new FolderModel({ 'name': 'roleCoordinator' + StringUtil.generateRandomString() });
     const roleCollaboratorFolderModel = new FolderModel({ 'name': 'roleCollaborator' + StringUtil.generateRandomString() });
@@ -96,11 +95,11 @@ describe('Permissions Component', function () {
 
         await alfrescoJsApi.login(fileOwnerUser.id, fileOwnerUser.password);
 
-        roleConsumerFolder = await uploadActions.createFolder(alfrescoJsApi, roleConsumerFolderModel.name, '-my-');
-        roleCoordinatorFolder = await uploadActions.createFolder(alfrescoJsApi, roleCoordinatorFolderModel.name, '-my-');
-        roleContributorFolder = await uploadActions.createFolder(alfrescoJsApi, roleContributorFolderModel.name, '-my-');
-        roleCollaboratorFolder = await uploadActions.createFolder(alfrescoJsApi, roleCollaboratorFolderModel.name, '-my-');
-        roleEditorFolder = await uploadActions.createFolder(alfrescoJsApi, roleEditorFolderModel.name, '-my-');
+        roleConsumerFolder = await uploadActions.createFolder(roleConsumerFolderModel.name, '-my-');
+        roleCoordinatorFolder = await uploadActions.createFolder(roleCoordinatorFolderModel.name, '-my-');
+        roleContributorFolder = await uploadActions.createFolder(roleContributorFolderModel.name, '-my-');
+        roleCollaboratorFolder = await uploadActions.createFolder(roleCollaboratorFolderModel.name, '-my-');
+        roleEditorFolder = await uploadActions.createFolder(roleEditorFolderModel.name, '-my-');
 
         folders = [roleConsumerFolder, roleContributorFolder, roleCoordinatorFolder, roleCollaboratorFolder, roleEditorFolder];
 
@@ -162,11 +161,11 @@ describe('Permissions Component', function () {
                 }
             });
 
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'RoleConsumer' + fileModel.name, roleConsumerFolder.entry.id);
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'RoleContributor' + fileModel.name, roleContributorFolder.entry.id);
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'RoleCoordinator' + fileModel.name, roleCoordinatorFolder.entry.id);
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'RoleCollaborator' + fileModel.name, roleCollaboratorFolder.entry.id);
-        await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, 'RoleEditor' + fileModel.name, roleEditorFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'RoleConsumer' + fileModel.name, roleConsumerFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'RoleContributor' + fileModel.name, roleContributorFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'RoleCoordinator' + fileModel.name, roleCoordinatorFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'RoleCollaborator' + fileModel.name, roleCollaboratorFolder.entry.id);
+        await uploadActions.uploadFile(fileModel.location, 'RoleEditor' + fileModel.name, roleEditorFolder.entry.id);
 
         done();
     });
@@ -174,21 +173,22 @@ describe('Permissions Component', function () {
     afterAll(async (done) => {
         await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await folders.forEach(function (folder) {
-            uploadActions.deleteFilesOrFolder(alfrescoJsApi, folder.entry.id);
+            uploadActions.deleteFileOrFolder(folder.entry.id);
+
         });
 
         done();
     });
 
-    describe('Inherit and assigning permissions', () => {
+    describe('Inherit and assigning permissions', function () {
 
         beforeEach(async (done) => {
 
             await alfrescoJsApi.login(fileOwnerUser.id, fileOwnerUser.password);
 
-            file = await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, fileModel.name, '-my-');
+            file = await uploadActions.uploadFile(fileModel.location, fileModel.name, '-my-');
 
-            await loginPage.loginToContentServicesUsingUserModel(fileOwnerUser);
+            loginPage.loginToContentServicesUsingUserModel(fileOwnerUser);
 
             contentServicesPage.goToDocumentList();
             contentServicesPage.checkContentIsDisplayed(fileModel.name);
@@ -204,25 +204,27 @@ describe('Permissions Component', function () {
         });
 
         afterEach(async (done) => {
-            try {
-                await uploadActions.deleteFilesOrFolder(alfrescoJsApi, file.entry.id);
-            } catch (error) {
-            }
+
+            await uploadActions.deleteFileOrFolder(file.entry.id);
 
             done();
+
         });
 
         it('[C268974] Inherit Permission', () => {
+
             permissionsPage.checkPermissionInheritedButtonIsDisplayed();
 
             expect(permissionsPage.getPermissionInheritedButtonText()).toBe('Permission Inherited');
 
             permissionsPage.checkPermissionsDatatableIsDisplayed();
+
             permissionsPage.clickPermissionInheritedButton();
 
             expect(permissionsPage.getPermissionInheritedButtonText()).toBe('Inherit Permission');
 
             permissionsPage.checkNoPermissionsIsDisplayed();
+
             permissionsPage.clickPermissionInheritedButton();
 
             expect(permissionsPage.getPermissionInheritedButtonText()).toBe('Permission Inherited');
@@ -232,54 +234,79 @@ describe('Permissions Component', function () {
         });
 
         it('[C286272] Should be able to see results when searching for a user', () => {
+
             permissionsPage.checkAddPermissionButtonIsDisplayed();
+
             permissionsPage.clickAddPermissionButton();
+
             permissionsPage.checkAddPermissionDialogIsDisplayed();
+
             permissionsPage.checkSearchUserInputIsDisplayed();
+
             permissionsPage.searchUserOrGroup('a');
+
             permissionsPage.checkResultListIsDisplayed();
 
         });
 
         it('[C276979] Should be able to give permissions to a group of people', () => {
+
             permissionsPage.checkAddPermissionButtonIsDisplayed();
+
             permissionsPage.clickAddPermissionButton();
+
             permissionsPage.checkAddPermissionDialogIsDisplayed();
+
             permissionsPage.checkSearchUserInputIsDisplayed();
+
             permissionsPage.searchUserOrGroup('GROUP_' + groupBody.id);
+
             permissionsPage.clickUserOrGroup('GROUP_' + groupBody.id);
+
             permissionsPage.checkUserOrGroupIsAdded('GROUP_' + groupBody.id);
 
         });
 
         it('[C277100] Should display EVERYONE group in the search result set', () => {
+
             permissionsPage.checkAddPermissionButtonIsDisplayed();
+
             permissionsPage.clickAddPermissionButton();
+
             permissionsPage.checkAddPermissionDialogIsDisplayed();
+
             permissionsPage.checkSearchUserInputIsDisplayed();
+
             permissionsPage.searchUserOrGroup(filePermissionUser.getId());
+
             permissionsPage.checkResultListIsDisplayed();
+
             permissionsPage.checkUserOrGroupIsDisplayed('EVERYONE');
+
             permissionsPage.searchUserOrGroup('somerandomtext');
+
             permissionsPage.checkResultListIsDisplayed();
+
             permissionsPage.checkUserOrGroupIsDisplayed('EVERYONE');
 
         });
 
     });
 
-    describe('Changing and duplicate Permissions', () => {
+    describe('Changing and duplicate Permissions', function () {
 
         beforeEach(async (done) => {
 
             await alfrescoJsApi.login(fileOwnerUser.id, fileOwnerUser.password);
 
-            file = await uploadActions.uploadFile(alfrescoJsApi, fileModel.location, fileModel.name, '-my-');
+            file = await uploadActions.uploadFile(fileModel.location, fileModel.name, '-my-');
 
-            await loginPage.loginToContentServicesUsingUserModel(fileOwnerUser);
+            loginPage.loginToContentServicesUsingUserModel(fileOwnerUser);
 
             contentServicesPage.goToDocumentList();
+
             contentServicesPage.checkContentIsDisplayed(fileModel.name);
+
             contentServicesPage.checkSelectedSiteIsDisplayed('My files');
 
             contentList.rightClickOnRow(fileModel.name);
@@ -287,11 +314,17 @@ describe('Permissions Component', function () {
             contentServicesPage.pressContextMenuActionNamed('Permission');
 
             permissionsPage.checkAddPermissionButtonIsDisplayed();
+
             permissionsPage.clickAddPermissionButton();
+
             permissionsPage.checkAddPermissionDialogIsDisplayed();
+
             permissionsPage.checkSearchUserInputIsDisplayed();
+
             permissionsPage.searchUserOrGroup(filePermissionUser.getId());
+
             permissionsPage.clickUserOrGroup(filePermissionUser.getFirstName());
+
             permissionsPage.checkUserOrGroupIsAdded(filePermissionUser.getId());
 
             done();
@@ -300,7 +333,7 @@ describe('Permissions Component', function () {
 
         afterEach(async (done) => {
 
-            await uploadActions.deleteFilesOrFolder(alfrescoJsApi, file.entry.id);
+            await uploadActions.deleteFileOrFolder(file.entry.id);
 
             done();
 
@@ -310,30 +343,38 @@ describe('Permissions Component', function () {
 
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Contributor');
 
-            permissionsPage.clickRoleDropdownByUserOrGroupName(filePermissionUser.getId());
+            permissionsPage.clickRoleDropdown();
 
             expect(permissionsPage.getRoleDropdownOptions().count()).toBe(5);
+
             expect(permissionsPage.getRoleDropdownOptions().get(0).getText()).toBe('Contributor');
+
             expect(permissionsPage.getRoleDropdownOptions().get(1).getText()).toBe('Collaborator');
+
             expect(permissionsPage.getRoleDropdownOptions().get(2).getText()).toBe('Coordinator');
+
             expect(permissionsPage.getRoleDropdownOptions().get(3).getText()).toBe('Editor');
+
             expect(permissionsPage.getRoleDropdownOptions().get(4).getText()).toBe('Consumer');
 
             permissionsPage.selectOption('Collaborator');
 
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Collaborator');
 
-            permissionsPage.clickRoleDropdownByUserOrGroupName(filePermissionUser.getId());
+            permissionsPage.clickRoleDropdown();
+
             permissionsPage.selectOption('Coordinator');
 
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Coordinator');
 
-            permissionsPage.clickRoleDropdownByUserOrGroupName(filePermissionUser.getId());
+            permissionsPage.clickRoleDropdown();
+
             permissionsPage.selectOption('Editor');
 
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Editor');
 
-            permissionsPage.clickRoleDropdownByUserOrGroupName(filePermissionUser.getId());
+            permissionsPage.clickRoleDropdown();
+
             permissionsPage.selectOption('Consumer');
 
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Consumer');
@@ -341,12 +382,17 @@ describe('Permissions Component', function () {
         });
 
         it('[C276980] Should not be able to duplicate User or Group to the locally set permissions', () => {
+
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Contributor');
 
             permissionsPage.clickAddPermissionButton();
+
             permissionsPage.checkAddPermissionDialogIsDisplayed();
+
             permissionsPage.checkSearchUserInputIsDisplayed();
+
             permissionsPage.searchUserOrGroup(filePermissionUser.getId());
+
             permissionsPage.clickUserOrGroup(filePermissionUser.getFirstName());
 
             expect(permissionsPage.getAssignPermissionErrorText()).toBe(duplicateUserPermissionMessage);
@@ -354,6 +400,7 @@ describe('Permissions Component', function () {
         });
 
         it('[C276982] Should be able to remove User or Group from the locally set permissions', () => {
+
             expect(permissionsPage.getRoleCellValue(filePermissionUser.getId())).toEqual('Contributor');
 
             permissionsPage.clickDeletePermissionButton();
@@ -364,11 +411,11 @@ describe('Permissions Component', function () {
 
     });
 
-    describe('Role: Consumer, Contributor, Coordinator, Collaborator, Editor, No Permissions', () => {
+    describe('Role: Consumer, Contributor, Coordinator, Collaborator, Editor, No Permissions', function () {
 
-        it('[C276993] Role Consumer', async () => {
+        it('[C276993] Role Consumer', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleConsumerFolder.entry.id);
 
@@ -383,7 +430,7 @@ describe('Permissions Component', function () {
 
             contentServicesPage.checkDeleteIsDisabled('RoleConsumer' + fileModel.name);
 
-            BrowserActions.closeMenuAndDialogs();
+            browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
             contentList.checkActionMenuIsNotDisplayed();
 
@@ -397,9 +444,9 @@ describe('Permissions Component', function () {
 
         });
 
-        it('[C276996] Role Contributor', async () => {
+        it('[C276996] Role Contributor', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleContributorFolder.entry.id);
 
@@ -414,7 +461,7 @@ describe('Permissions Component', function () {
 
             contentServicesPage.checkDeleteIsDisabled('RoleContributor' + fileModel.name);
 
-            BrowserActions.closeMenuAndDialogs();
+            browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
             contentList.checkActionMenuIsNotDisplayed();
 
@@ -429,9 +476,9 @@ describe('Permissions Component', function () {
 
         });
 
-        it('[C277000] Role Editor', async () => {
+        it('[C277000] Role Editor', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleEditorFolder.entry.id);
 
@@ -446,7 +493,7 @@ describe('Permissions Component', function () {
 
             contentServicesPage.checkDeleteIsDisabled('RoleEditor' + fileModel.name);
 
-            BrowserActions.closeMenuAndDialogs();
+            browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
             browser.controlFlow().execute(async () => {
 
@@ -476,9 +523,9 @@ describe('Permissions Component', function () {
 
         });
 
-        it('[C277003] Role Collaborator', async () => {
+        it('[C277003] Role Collaborator', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleCollaboratorFolder.entry.id);
 
@@ -493,7 +540,7 @@ describe('Permissions Component', function () {
 
             contentServicesPage.checkDeleteIsDisabled('RoleCollaborator' + fileModel.name);
 
-            BrowserActions.closeMenuAndDialogs();
+            browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
             browser.controlFlow().execute(async () => {
 
@@ -524,9 +571,9 @@ describe('Permissions Component', function () {
 
         });
 
-        it('[C277004] Role Coordinator', async () => {
+        it('[C277004] Role Coordinator', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleCoordinatorFolder.entry.id);
 
@@ -569,9 +616,9 @@ describe('Permissions Component', function () {
 
         });
 
-        it('[C279881] No Permission User', async () => {
+        it('[C279881] No Permission User', () => {
 
-            await loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
+            loginPage.loginToContentServicesUsingUserModel(filePermissionUser);
 
             navigationBarPage.openContentServicesFolder(roleConsumerFolder.entry.id);
 

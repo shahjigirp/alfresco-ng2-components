@@ -29,14 +29,18 @@ import { FolderModel } from '../../../models/ACS/folderModel';
 import { AcsUserModel } from '../../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/testing';
+import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 
     const viewerPage = new ViewerPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const uploadActions = new UploadActions();
+    const alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
 
@@ -51,11 +55,6 @@ describe('Viewer', () => {
     });
 
     beforeAll(async (done) => {
-
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
@@ -81,13 +80,13 @@ describe('Viewer', () => {
         let imgFolderUploaded, imgFolderRenditionUploaded;
 
         beforeAll(async (done) => {
-            imgFolderUploaded = await uploadActions.createFolder(this.alfrescoJsApi, imgFolderInfo.name, '-my-');
+            imgFolderUploaded = await uploadActions.createFolder(imgFolderInfo.name, '-my-');
 
-            uploadedImages = await uploadActions.uploadFolder(this.alfrescoJsApi, imgFolderInfo.location, imgFolderUploaded.entry.id);
+            uploadedImages = await uploadActions.uploadFolder(imgFolderInfo.location, imgFolderUploaded.entry.id);
 
-            imgFolderRenditionUploaded = await uploadActions.createFolder(this.alfrescoJsApi, imgRenditionFolderInfo.name, imgFolderUploaded.entry.id);
+            imgFolderRenditionUploaded = await uploadActions.createFolder(imgRenditionFolderInfo.name, imgFolderUploaded.entry.id);
 
-            uploadedImgRenditionFolderInfo = await uploadActions.uploadFolder(this.alfrescoJsApi, imgRenditionFolderInfo.location, imgFolderRenditionUploaded.entry.id);
+            uploadedImgRenditionFolderInfo = await uploadActions.uploadFolder(imgRenditionFolderInfo.location, imgFolderRenditionUploaded.entry.id);
 
             await loginPage.loginToContentServicesUsingUserModel(acsUser);
             contentServicesPage.goToDocumentList();
@@ -96,7 +95,7 @@ describe('Viewer', () => {
         });
 
         afterAll(async (done) => {
-            await uploadActions.deleteFilesOrFolder(this.alfrescoJsApi, imgFolderUploaded.entry.id);
+            await uploadActions.deleteFileOrFolder(imgFolderUploaded.entry.id);
             done();
         });
 
