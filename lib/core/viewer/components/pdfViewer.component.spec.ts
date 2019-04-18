@@ -128,7 +128,8 @@ describe('Test PdfViewer component', () => {
 
     setupTestBed({
         imports: [
-            CoreModule.forRoot()
+            CoreModule.forRoot(),
+            RouterTestingModule
         ],
         declarations: [
             TestDialogComponent,
@@ -145,7 +146,8 @@ describe('Test PdfViewer component', () => {
                     }
                 }
             },
-            RenderingQueueServices
+            RenderingQueueServices,
+            PreviousRouteService
         ]
     });
 
@@ -165,6 +167,7 @@ describe('Test PdfViewer component', () => {
             done();
         });
     });
+
     it('should Loader be present', () => {
         expect(element.querySelector('.adf-loader-container')).not.toBeNull();
     });
