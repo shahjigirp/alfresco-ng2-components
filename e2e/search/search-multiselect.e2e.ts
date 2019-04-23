@@ -18,13 +18,10 @@
 import TestConfig = require('../test.config');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 
-import { StringUtil } from '@alfresco/adf-testing';
+import { StringUtil, UploadActions, LoginPage } from '@alfresco/adf-testing';
 import resources = require('../util/resources');
 import CONSTANTS = require('../util/constants');
-import { UploadActions } from '@alfresco/adf-testing';
 import { browser } from 'protractor';
-
-import { LoginPage } from '@alfresco/adf-testing';
 import { SearchDialog } from '../pages/adf/dialog/searchDialog';
 import { SearchResultsPage } from '../pages/adf/searchResultsPage';
 import { SearchFiltersPage } from '../pages/adf/searchFiltersPage';

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { LoginPage } from '@alfresco/adf-testing';
+import { LoginPage, UploadActions, StringUtil } from '@alfresco/adf-testing';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import { MetadataViewPage } from '../../pages/adf/metadataViewPage';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
@@ -27,9 +27,6 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/adf-testing';
-
-import { StringUtil } from '@alfresco/adf-testing';
 import CONSTANTS = require('../../util/constants');
 
 describe('permissions', () => {
