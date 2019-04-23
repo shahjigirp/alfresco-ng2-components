@@ -75,11 +75,11 @@ describe('Content Services Viewer', () => {
         'name': resources.Files.ADF_DOCUMENTS.PPT.file_name,
         'firstPageText': resources.Files.ADF_DOCUMENTS.PPT.first_page_text
     });
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     beforeAll(async (done) => {
 

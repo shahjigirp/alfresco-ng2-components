@@ -69,11 +69,11 @@ describe('Version component permissions', () => {
         'location': resources.Files.ADF_DOCUMENTS.PNG_D.file_location
     });
 
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const nodeActions = new NodeActions();
 
     beforeAll(async (done) => {

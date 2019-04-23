@@ -31,7 +31,7 @@ import { browser } from 'protractor';
 
 describe('Unshare file', () => {
 
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
@@ -44,7 +44,7 @@ describe('Unshare file', () => {
     const siteName = `PRIVATE-TEST-SITE-${StringUtil.generateRandomString(5)}`;
 
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     let nodeBody;
     let nodeId;
     let testSite;

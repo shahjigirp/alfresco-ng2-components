@@ -33,11 +33,11 @@ describe('Tree View Component', () => {
     const treeViewPage = new TreeViewPage();
 
     const acsUser = new AcsUserModel();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     let treeFolder, secondTreeFolder, thirdTreeFolder;
 

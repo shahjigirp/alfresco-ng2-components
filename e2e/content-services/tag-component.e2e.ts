@@ -37,11 +37,11 @@ describe('Tag component', () => {
     const navigationBarPage = new NavigationBarPage();
 
     const acsUser = new AcsUserModel();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const pdfFileModel = new FileModel({ 'name': resources.Files.ADF_DOCUMENTS.PDF.file_name });
     const deleteFile = new FileModel({ 'name': StringUtil.generateRandomString() });
     const sameTag = StringUtil.generateRandomString().toLowerCase();

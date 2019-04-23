@@ -57,11 +57,11 @@ describe('Search Sorting Picker', () => {
     };
 
     let pngA, pngD;
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const search = '_png_file.png';
     let jsonFile;
 

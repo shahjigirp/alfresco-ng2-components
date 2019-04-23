@@ -66,7 +66,7 @@ describe('Document List - Pagination', function () {
         fileNames = Util.generateSequenceFiles(10, nrOfFiles + 9, pagination.base, pagination.extension);
         secondSetOfFiles = Util.generateSequenceFiles(10, secondSetNumber + 9, pagination.secondSetBase, pagination.extension);
 
-        const alfrescoJsApi = new AlfrescoApi({
+        this.alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
@@ -84,7 +84,7 @@ describe('Document List - Pagination', function () {
 
         await uploadActions.createEmptyFiles(secondSetOfFiles, folderThreeUploadedModel.entry.id);
 
-        await loginPage.loginToContentServicesUsingUserModel(acsUser);
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
 
         done();
     });

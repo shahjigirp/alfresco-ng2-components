@@ -73,11 +73,11 @@ describe('Search component - Search Page', () => {
             'name': search.active.firstFile,
             'location': resources.Files.ADF_DOCUMENTS.TXT.file_location
         });
-        const alfrescoJsApi = new AlfrescoApi({
+        this.alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
-        const uploadActions = new UploadActions(alfrescoJsApi);
+        const uploadActions = new UploadActions(this.alfrescoJsApi);
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);

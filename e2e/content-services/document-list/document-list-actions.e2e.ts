@@ -38,11 +38,11 @@ describe('Document List Component - Actions', () => {
     const paginationPage = new PaginationPage();
     const breadCrumbDropdownPage = new BreadCrumbDropdownPage();
     const breadCrumbPage = new BreadCrumbPage();
-    const alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    this.alfrescoJsApi = new AlfrescoApi({
+                provider: 'ECM',
+                hostEcm: TestConfig.adf.url
+            });
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const infinitePaginationPage = new InfinitePaginationPage(element(by.css('adf-content-node-selector')));
 
     describe('Document List Component - Check Actions', () => {
@@ -71,9 +71,9 @@ describe('Document List Component - Actions', () => {
         beforeAll(async (done) => {
             acsUser = new AcsUserModel();
             folderName = `TATSUMAKY_${StringUtil.generateRandomString(5)}_SENPOUKYAKU`;
-            await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
-            await alfrescoJsApi.core.peopleApi.addPerson(acsUser);
-            await alfrescoJsApi.login(acsUser.id, acsUser.password);
+            await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+            await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
+            await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
             pdfUploadedNode = await uploadActions.uploadFile(pdfFileModel.location, pdfFileModel.name, '-my-');
             await uploadActions.uploadFile(testFileModel.location, testFileModel.name, '-my-');
             uploadedFolder = await uploadActions.createFolder(folderName, '-my-');
@@ -82,13 +82,13 @@ describe('Document List Component - Actions', () => {
             fileNames = Util.generateSequenceFiles(1, nrOfFiles, files.base, files.extension);
             await uploadActions.createEmptyFiles(fileNames, uploadedFolder.entry.id);
 
-            await loginPage.loginToContentServicesUsingUserModel(acsUser);
+            loginPage.loginToContentServicesUsingUserModel(acsUser);
 
-            await browser.driver.sleep(15000);
+            browser.driver.sleep(10000);
             done();
         });
 
-        beforeEach((done) => {
+        beforeEach(async (done) => {
             navigationBarPage.clickContentServicesButton();
             done();
         });
@@ -225,9 +225,9 @@ describe('Document List Component - Actions', () => {
 
         beforeAll(async (done) => {
 
-            await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
-            await alfrescoJsApi.core.peopleApi.addPerson(contentServicesUser);
-            await alfrescoJsApi.login(contentServicesUser.id, contentServicesUser.password);
+            await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+            await this.alfrescoJsApi.core.peopleApi.addPerson(contentServicesUser);
+            await this.alfrescoJsApi.login(contentServicesUser.id, contentServicesUser.password);
             folder1 = await uploadActions.createFolder('A' + folderModel1.name, '-my-');
             folder2 = await uploadActions.createFolder('B' + folderModel2.name, '-my-');
             folder3 = await uploadActions.createFolder('C' + folderModel3.name, '-my-');
@@ -249,7 +249,7 @@ describe('Document List Component - Actions', () => {
         });
 
         afterAll(async (done) => {
-            await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+            await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
             await folders.forEach(function (folder) {
                 uploadActions.deleteFileOrFolder(folder.entry.id);
             });

@@ -49,11 +49,11 @@ describe('Aspect oriented config', () => {
     });
 
     beforeAll(async (done) => {
-        const alfrescoJsApi = new AlfrescoApi({
+        this.alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
-        const uploadActions = new UploadActions(alfrescoJsApi);
+        const uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 

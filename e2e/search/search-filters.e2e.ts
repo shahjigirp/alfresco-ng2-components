@@ -37,11 +37,11 @@ describe('Search Filters', () => {
     const loginPage = new LoginPage();
     const searchDialog = new SearchDialog();
     const searchFiltersPage = new SearchFiltersPage();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const paginationPage = new PaginationPage();
     const contentList = new DocumentListPage();
     const searchResults = new SearchResultsPage();

@@ -36,11 +36,11 @@ describe('Search Component - Multi-Select Facet', () => {
     const loginPage = new LoginPage();
     const searchDialog = new SearchDialog();
     const searchResultsPage = new SearchResultsPage();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const searchFiltersPage = new SearchFiltersPage();
     let site, userOption;
 

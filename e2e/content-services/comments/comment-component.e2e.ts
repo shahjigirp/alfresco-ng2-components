@@ -30,6 +30,7 @@ import CONSTANTS = require('../../util/constants');
 import { StringUtil } from '@alfresco/adf-testing';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
+import { browser } from 'protractor';
 
 describe('Comment Component', () => {
 
@@ -67,6 +68,7 @@ describe('Comment Component', () => {
     beforeAll(async (done) => {
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
 
         done();
@@ -82,7 +84,7 @@ describe('Comment Component', () => {
 
         userFullName = pngUploadedFile.entry.createdByUser.displayName;
 
-        await loginPage.loginToContentServicesUsingUserModel(acsUser);
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
 
         navigationBar.clickContentServicesButton();
         contentServicesPage.waitForTableBody();
@@ -192,7 +194,7 @@ describe('Comment Component', () => {
 
             pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, site.entry.guid);
 
-            await loginPage.loginToContentServicesUsingUserModel(acsUser);
+            loginPage.loginToContentServicesUsingUserModel(acsUser);
 
             navigationBar.clickContentServicesButton();
 

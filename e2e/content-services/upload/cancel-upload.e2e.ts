@@ -33,7 +33,7 @@ import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Upload component', () => {
 
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });

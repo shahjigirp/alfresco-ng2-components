@@ -55,11 +55,11 @@ describe('Search component - Search Bar', () => {
     const filePreviewPage = new FilePreviewPage();
 
     const acsUser = new AcsUserModel();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     const filename = StringUtil.generateRandomString(16);
     const firstFolderName = StringUtil.generateRandomString(16);

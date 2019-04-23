@@ -38,11 +38,11 @@ describe('Info Drawer', () => {
     const navigationBarPage = new NavigationBarPage();
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     let site;
     const acsUser = new AcsUserModel();
     let pngFileUploaded;

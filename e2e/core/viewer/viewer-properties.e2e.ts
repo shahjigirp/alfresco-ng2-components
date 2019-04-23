@@ -49,11 +49,11 @@ describe('Viewer - properties', () => {
         'name': 'fileForOverlay.png',
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     beforeAll(async (done) => {
 

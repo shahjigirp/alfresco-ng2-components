@@ -32,7 +32,7 @@ import { browser } from 'protractor';
 
 describe('Share file', () => {
 
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
@@ -44,7 +44,7 @@ describe('Share file', () => {
     const viewerPage = new ViewerPage();
 
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,

@@ -52,7 +52,7 @@ describe('SSO in ADF using ACS and AIS, Download Directive, Viewer, DocumentList
 
     let pdfUploadedFile, pngUploadedFile, folder;
 
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url,
         authType: 'OAUTH',
@@ -67,7 +67,7 @@ describe('SSO in ADF using ACS and AIS, Download Directive, Viewer, DocumentList
             redirectUriLogout: '/logout'
         }
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const downloadedPngFile = path.join(__dirname, 'downloads', pngFileModel.name);
     const downloadedMultipleFiles = path.join(__dirname, 'downloads', 'archive.zip');
     const folderName = StringUtil.generateRandomString(5);

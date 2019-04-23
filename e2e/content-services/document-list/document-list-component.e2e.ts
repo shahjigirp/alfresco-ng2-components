@@ -36,11 +36,11 @@ describe('Document List Component', () => {
     const errorPage = new ErrorPage();
     let privateSite;
     let uploadedFolder, uploadedFolderExtra;
-    const alfrescoJsApi = new AlfrescoApi({
+    this.alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
-    const uploadActions = new UploadActions(alfrescoJsApi);
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
     let acsUser = null;
     let testFileNode, pdfBFileNode;
 
