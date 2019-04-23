@@ -30,6 +30,10 @@ import { AcsUserModel } from '../../../models/ACS/acsUserModel';
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { UploadActions } from '@alfresco/adf-testing';
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
+<<<<<<< Updated upstream
+=======
+import { UploadActions } from '@alfresco/adf-testing';
+>>>>>>> Stashed changes
 
 describe('Viewer', () => {
 
