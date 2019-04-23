@@ -30,10 +30,6 @@ import CONSTANTS = require('../../util/constants');
 import { StringUtil } from '@alfresco/adf-testing';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-<<<<<<< Updated upstream
-=======
-import { UploadActions } from '@alfresco/adf-testing';
->>>>>>> Stashed changes
 import { browser } from 'protractor';
 
 describe('Comment Component', () => {

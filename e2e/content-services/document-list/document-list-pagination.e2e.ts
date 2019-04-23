@@ -27,10 +27,6 @@ import TestConfig = require('../../test.config');
 import { Util } from '../../util/util';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-<<<<<<< Updated upstream
-=======
-import { UploadActions } from '@alfresco/adf-testing';
->>>>>>> Stashed changes
 
 describe('Document List - Pagination', function () {
     const pagination = {
