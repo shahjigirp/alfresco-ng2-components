@@ -127,7 +127,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges {
             if (this.isValidationEnabled()) {
                 this.loadPreSelectUsers();
             } else {
-                this.loadNoValidationPreselctUsers();
+                this.loadNoValidationPreselectUsers();
             }
         }
 
@@ -185,7 +185,15 @@ export class PeopleCloudComponent implements OnInit, OnChanges {
                 this.invalidUsers.push(user);
             }
         });
+        validUsers =  this.removeDuplicatedUsers(validUsers);
         return validUsers;
+    }
+
+    private removeDuplicatedUsers(users) {
+        return users.filter((user, index) =>
+                    index === users.findIndex((t) => (
+                        t.id === user.id
+                    )));
     }
 
     async filterPreselectUsers() {
@@ -317,7 +325,20 @@ export class PeopleCloudComponent implements OnInit, OnChanges {
         }
     }
 
-    loadNoValidationPreselctUsers() {
+    async loadNoValidationPreselectUsers() {
+        let users: IdentityUserModel[];
+
+        try {
+            users = await this.filterPreselectUsers();
+        } catch (error) {
+            users = [];
+            this.logService.error(error);
+        }
+
+        const filteredUsers = users.filter((user) => user);
+
+        this.preSelectUsers = [...filteredUsers];
+
         if (this.isMultipleMode()) {
             this.selectedUsersSubject.next(this.preSelectUsers);
         } else {
