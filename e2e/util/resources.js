@@ -516,7 +516,12 @@ exports.Files = {
 exports.ACTIVITI7_APPS = {
     CANDIDATE_USER_APP: {
         name: "candidateuserapp",
-        file_location: "/resources/activiti7/candidateuserapp.zip"
+        file_location: "/resources/activiti7/candidateuserapp.zip",
+        processes: {
+            candidateGroupProcess: "candidateGroupTask",
+            candidateUserProcess: "candidateUserTask",
+            assigneeProcess: "assignedTask"
+        }
     },
     SIMPLE_APP: {
         name: "simpleapp",
