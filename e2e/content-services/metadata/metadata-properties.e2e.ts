@@ -26,6 +26,10 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
+<<<<<<< Updated upstream
+=======
+import { UploadActions } from '@alfresco/adf-testing';
+>>>>>>> Stashed changes
 import { check, uncheck } from '../../util/material';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';

@@ -146,6 +146,13 @@ saveReport = async function (filenameReport, alfrescoJsApi) {
     }
 };
 
+const appConfig = {
+    "rootPath": __dirname,
+    "oauth2": {
+        "clientId" : "activiti"
+    }
+};
+
 
 exports.config = {
     allScriptsTimeout: TIMEOUT,
@@ -178,12 +185,16 @@ exports.config = {
     baseUrl: "http://" + HOST,
 
     params: {
+<<<<<<< Updated upstream
         rootPath: __dirname,
         config: {
             oauth2: {
                 clientId: 'activiti'
             }
         }
+=======
+        config: appConfig
+>>>>>>> Stashed changes
     },
 
     framework: 'jasmine2',
