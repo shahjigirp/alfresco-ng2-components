@@ -155,7 +155,7 @@ exports.config = {
     ],
 
     useAllAngular2AppRoots: true,
-
+   
     capabilities: {
         browserName: 'chrome',
 
@@ -178,6 +178,7 @@ exports.config = {
     baseUrl: "http://" + HOST,
 
     params: {
+        rootPath: __dirname,
         config: {
             oauth2: {
                 clientId: 'activiti'

@@ -38,19 +38,18 @@ describe('Document List Component - Actions', () => {
     const paginationPage = new PaginationPage();
     const breadCrumbDropdownPage = new BreadCrumbDropdownPage();
     const breadCrumbPage = new BreadCrumbPage();
-    this.alfrescoJsApi = new AlfrescoApi({
-                provider: 'ECM',
-                hostEcm: TestConfig.adf.url
-            });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const infinitePaginationPage = new InfinitePaginationPage(element(by.css('adf-content-node-selector')));
+    let uploadActions;
 
     describe('Document List Component - Check Actions', () => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
-        let uploadedFolder, secondUploadedFolder;
+        let uploadedFolder, secondUploadedFolder, folderName;
         let acsUser = null;
-        let pdfUploadedNode;
-        let folderName;
         let fileNames = [];
         const nrOfFiles = 5;
 
@@ -74,7 +73,7 @@ describe('Document List Component - Actions', () => {
             await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
             await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
             await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
-            pdfUploadedNode = await uploadActions.uploadFile(pdfFileModel.location, pdfFileModel.name, '-my-');
+            await uploadActions.uploadFile(pdfFileModel.location, pdfFileModel.name, '-my-');
             await uploadActions.uploadFile(testFileModel.location, testFileModel.name, '-my-');
             uploadedFolder = await uploadActions.createFolder(folderName, '-my-');
             secondUploadedFolder = await uploadActions.createFolder('secondFolder', '-my-');
@@ -96,11 +95,9 @@ describe('Document List Component - Actions', () => {
         describe('File Actions', () => {
 
             it('[C213257] Should be able to copy a file', () => {
-                contentServicesPage.checkContentIsDisplayed(pdfUploadedNode.entry.name);
-
+                contentServicesPage.checkContentIsDisplayed(pdfFileModel.name);
                 contentServicesPage.getDocumentList().rightClickOnRow(pdfFileModel.name);
                 contentServicesPage.pressContextMenuActionNamed('Copy');
-
                 contentNodeSelector.checkDialogIsDisplayed();
                 contentNodeSelector.typeIntoNodeSelectorSearchField(folderName);
                 contentNodeSelector.clickContentNodeSelectorResult(folderName);

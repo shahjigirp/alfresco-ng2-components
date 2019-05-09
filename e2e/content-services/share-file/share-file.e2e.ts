@@ -20,40 +20,34 @@ import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import { ShareDialog } from '../../pages/adf/dialog/shareDialog';
-
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import { FileModel } from '../../models/ACS/fileModel';
-
 import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
-
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { browser } from 'protractor';
 
 describe('Share file', () => {
-
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const contentListPage = contentServicesPage.getDocumentList();
     const shareDialog = new ShareDialog();
     const navigationBarPage = new NavigationBarPage();
     const viewerPage = new ViewerPage();
-
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
 
-    let nodeId;
+    let nodeId, uploadActions;
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
@@ -164,7 +158,7 @@ describe('Share file', () => {
     });
 
     describe('Shared link preview', () => {
-        afterEach( (done) => {
+        afterEach((done) => {
             loginPage.loginToContentServicesUsingUserModel(acsUser);
             navigationBarPage.clickContentServicesButton();
             done();

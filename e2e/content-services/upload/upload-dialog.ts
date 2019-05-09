@@ -36,12 +36,6 @@ describe('Upload component', () => {
     const uploadToggles = new UploadToggles();
     const loginPage = new LoginPage();
     const acsUser = new AcsUserModel();
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-
     const firstPdfFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PDF_B.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PDF_B.file_location
@@ -64,8 +58,14 @@ describe('Upload component', () => {
     });
     const filesLocation = [pdfFileModel.location, docxFileModel.location, pngFileModel.location, firstPdfFileModel.location];
     const filesName = [pdfFileModel.name, docxFileModel.name, pngFileModel.name, firstPdfFileModel.name];
+    let uploadActions;
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 

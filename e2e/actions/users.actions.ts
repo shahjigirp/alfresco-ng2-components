@@ -17,7 +17,7 @@
 
 import { Tenant } from '../models/APS/tenant';
 import { User } from '../models/APS/user';
-import TestConfig = require('../test.config');
+import TestConfig = require('../test.config.js');
 import path = require('path');
 import fs = require('fs');
 import remote = require('selenium-webdriver/remote');

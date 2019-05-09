@@ -68,18 +68,17 @@ describe('Version component permissions', () => {
         'name': resources.Files.ADF_DOCUMENTS.PNG_D.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG_D.file_location
     });
-
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const nodeActions = new NodeActions();
+    let uploadActions;
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
-
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         await this.alfrescoJsApi.core.peopleApi.addPerson(consumerUser);
         await this.alfrescoJsApi.core.peopleApi.addPerson(collaboratorUser);

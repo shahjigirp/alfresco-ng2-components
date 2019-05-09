@@ -31,10 +31,6 @@ import { browser } from 'protractor';
 
 describe('Unshare file', () => {
 
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const contentListPage = contentServicesPage.getDocumentList();
@@ -42,18 +38,19 @@ describe('Unshare file', () => {
     const errorPage = new ErrorPage();
     const shareDialog = new ShareDialog();
     const siteName = `PRIVATE-TEST-SITE-${StringUtil.generateRandomString(5)}`;
-
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-    let nodeBody;
-    let nodeId;
-    let testSite;
+    let nodeBody, nodeId, testSite, uploadActions;
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
         const site = {
             title: siteName,
             visibility: 'PRIVATE',

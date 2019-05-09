@@ -20,7 +20,6 @@ import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { CreateFolderDialog } from '../../pages/adf/dialog/createFolderDialog';
 import { NotificationPage } from '../../pages/adf/notificationPage';
 import { MetadataViewPage } from '../../pages/adf/metadataViewPage';
-
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import TestConfig = require('../../test.config');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
@@ -33,7 +32,6 @@ describe('Create folder directive', function () {
     const createFolderDialog = new CreateFolderDialog();
     const notificationPage = new NotificationPage();
     const metadataViewPage = new MetadataViewPage();
-
     const acsUser = new AcsUserModel();
 
     beforeAll(async (done) => {

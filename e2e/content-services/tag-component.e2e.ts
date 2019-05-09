@@ -20,7 +20,7 @@ import { FileModel } from '../models/ACS/fileModel';
 
 import { LoginPage, UploadActions } from '@alfresco/adf-testing';
 import { TagPage } from '../pages/adf/tagPage';
-import { NavigationBarPage } from '../pages/adf/navigationBarPage';
+import { AppNavigationBarPage } from '../pages/adf/process-services/appNavigationBarPage';
 
 import TestConfig = require('../test.config');
 import resources = require('../util/resources');
@@ -34,14 +34,8 @@ describe('Tag component', () => {
 
     const loginPage = new LoginPage();
     const tagPage = new TagPage();
-    const navigationBarPage = new NavigationBarPage();
-
+    const appNavigationBarPage = new AppNavigationBarPage();
     const acsUser = new AcsUserModel();
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
     const pdfFileModel = new FileModel({ 'name': resources.Files.ADF_DOCUMENTS.PDF.file_name });
     const deleteFile = new FileModel({ 'name': StringUtil.generateRandomString() });
     const sameTag = StringUtil.generateRandomString().toLowerCase();
@@ -63,9 +57,14 @@ describe('Tag component', () => {
     const uppercaseTag = StringUtil.generateRandomString().toUpperCase();
     const digitsTag = StringUtil.generateRandomStringDigits();
     const nonLatinTag = StringUtil.generateRandomStringNonLatin();
-    let pdfUploadedFile, nodeId;
+    let pdfUploadedFile, nodeId, uploadActions;
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -85,7 +84,9 @@ describe('Tag component', () => {
 
         await this.alfrescoJsApi.core.tagsApi.addTag(nodeId, tags);
 
-        await loginPage.loginToContentServicesUsingUserModel(acsUser);
+        loginPage.loginToContentServicesUsingUserModel(acsUser);
+
+        appNavigationBarPage.clickTagButton();
 
         done();
     });
@@ -97,8 +98,6 @@ describe('Tag component', () => {
     });
 
     it('[C260374] Should NOT be possible to add a new tag without Node ID', () => {
-        navigationBarPage.clickTagButton();
-
         expect(tagPage.getNodeId()).toEqual('');
         expect(tagPage.getNewTagPlaceholder()).toEqual('New Tag');
         expect(tagPage.addTagButtonIsEnabled()).toEqual(false);

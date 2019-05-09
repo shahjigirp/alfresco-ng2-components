@@ -53,14 +53,7 @@ describe('Search component - Search Bar', () => {
     const searchDialog = new SearchDialog();
     const searchResultPage = new SearchResultsPage();
     const filePreviewPage = new FilePreviewPage();
-
     const acsUser = new AcsUserModel();
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-
     const filename = StringUtil.generateRandomString(16);
     const firstFolderName = StringUtil.generateRandomString(16);
     const secondFolderName = StringUtil.generateRandomString(16);
@@ -83,9 +76,16 @@ describe('Search component - Search Bar', () => {
 
     const term = 'Zoizo';
 
-    let fileHighlightUploaded;
+    let fileHighlightUploaded, uploadActions;
 
     beforeAll(async (done) => {
+
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
+
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);

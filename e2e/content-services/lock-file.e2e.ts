@@ -42,12 +42,6 @@ describe('Lock File', () => {
 
     const adminUser = new AcsUserModel();
     const managerUser = new AcsUserModel();
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
@@ -58,9 +52,14 @@ describe('Lock File', () => {
         'location': resources.Files.ADF_DOCUMENTS.PNG_B.file_location
     });
 
-    let nodeId, site, documentLibrary, lockedFileNodeId;
+    let nodeId, site, documentLibrary, lockedFileNodeId, uploadActions;
 
     beforeAll(async (done) => {
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 

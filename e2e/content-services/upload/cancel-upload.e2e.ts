@@ -32,18 +32,11 @@ import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Upload component', () => {
-
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
     const contentServicesPage = new ContentServicesPage();
     const uploadDialog = new UploadDialog();
     const uploadToggles = new UploadToggles();
     const loginPage = new LoginPage();
     const acsUser = new AcsUserModel();
-    const uploadActions = new UploadActions(this.alfrescoJsApi);
-
     const firstPdfFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PDF_B.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PDF_B.file_location
@@ -56,9 +49,14 @@ describe('Upload component', () => {
         'name': resources.Files.ADF_DOCUMENTS.LARGE_FILE.file_name,
         'location': resources.Files.ADF_DOCUMENTS.LARGE_FILE.file_location
     });
+    let uploadActions;
 
     beforeAll(async (done) => {
-
+        this.alfrescoJsApi = new AlfrescoApi({
+            provider: 'ECM',
+            hostEcm: TestConfig.adf.url
+        });
+        uploadActions = new UploadActions(this.alfrescoJsApi);
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);

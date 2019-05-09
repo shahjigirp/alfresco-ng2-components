@@ -47,13 +47,14 @@ describe('Aspect oriented config', () => {
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
+    let uploadActions;
 
     beforeAll(async (done) => {
         this.alfrescoJsApi = new AlfrescoApi({
             provider: 'ECM',
             hostEcm: TestConfig.adf.url
         });
-        const uploadActions = new UploadActions(this.alfrescoJsApi);
+        uploadActions = new UploadActions(this.alfrescoJsApi);
 
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
