@@ -79,6 +79,11 @@ describe('Process list cloud', () => {
             'businessKey': StringUtil.generateRandomString(5)
         });
 
+        await processInstancesService.createProcessInstance(processDefinition.list.entries[1].entry.key, candidateuserapp, {
+            'name': StringUtil.generateRandomString(5),
+            'businessKey': StringUtil.generateRandomString(5)
+        });
+
         runningProcessInstance = await processInstancesService.createProcessInstance(processDefinition.list.entries[0].entry.key, candidateuserapp, {
             'name': StringUtil.generateRandomString(5),
             'businessKey': StringUtil.generateRandomString(5)
