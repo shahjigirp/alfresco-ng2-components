@@ -29,6 +29,8 @@ import resources = require('../util/resources');
 
 import { browser, protractor } from 'protractor';
 import CONSTANTS = require('../util/constants');
+import { ProcessListCloudConfiguration } from './processListCloud.config';
+import { EditProcessFilterConfiguration } from './editProcessFilter.config';
 
 describe('Process list cloud', () => {
 
@@ -51,105 +53,20 @@ describe('Process list cloud', () => {
     const apiService = new ApiService('activiti', TestConfig.adf.hostBPM, TestConfig.adf.hostSso, 'BPM');
     const identityService = new IdentityService(apiService);
     const rolesService = new RolesService(apiService);
+    const processListCloudConfiguration = new ProcessListCloudConfiguration();
+    const editProcessFilterConfiguration = new EditProcessFilterConfiguration();
+    let processListCloudConfigFile, editProcessFilterConfigFile;
+
     beforeAll(async (done) => {
         settingsPage.setProviderBpmSso(TestConfig.adf.hostBPM, TestConfig.adf.hostSso, TestConfig.adf.hostIdentity, false);
         loginSSOPage.clickOnSSOButton();
         loginSSOPage.loginSSOIdentityService(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+        processListCloudConfigFile = processListCloudConfiguration.getConfiguration();
+        editProcessFilterConfigFile = editProcessFilterConfiguration.getConfiguration();
 
-        await LocalStorageUtil.setConfigField('adf-edit-process-filter', JSON.stringify({
-            'filterProperties': [
-                'appName',
-                'status',
-                'sort',
-                'order',
-                'processName',
-                'lastModified',
-                'processInstanceId',
-                'initiator',
-                'processDefinitionId',
-                'processDefinitionKey',
-                'startDate',
-                'businessKey'
-            ],
-            'sortProperties': [
-                'id',
-                'name',
-                'status',
-                'startDate',
-                'businessKey',
-                'initiator',
-                'processDefinitionId',
-                'processDefinitionKey',
-                'lastModified'
-            ],
-            'actions': [
-                'save',
-                'saveAs',
-                'delete'
-            ]
-        }));
+        await LocalStorageUtil.setConfigField('adf-edit-process-filter', JSON.stringify(editProcessFilterConfigFile));
 
-        await LocalStorageUtil.setConfigField('adf-cloud-process-list', JSON.stringify({
-            'presets': {
-                'default': [
-                    {
-                        'key': 'entry.id',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.ID',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.name',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.NAME',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.status',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.STATUS',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.startDate',
-                        'type': 'date',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.START_DATE',
-                        'sortable': true,
-                        'format': 'timeAgo'
-                    },
-                    {
-                        'key': 'entry.businessKey',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.BUSINESS_KEY',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.initiator',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.INITIATOR',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.lastModified',
-                        'type': 'date',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.LAST_MODIFIED',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.processDefinitionId',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.PROCESS_DEF_ID',
-                        'sortable': true
-                    },
-                    {
-                        'key': 'entry.processDefinitionKey',
-                        'type': 'text',
-                        'title': 'ADF_CLOUD_PROCESS_LIST.PROPERTIES.PROCESS_DEF_KEY',
-                        'sortable': true
-                    }
-                ]
-            }
-        }));
+        await LocalStorageUtil.setConfigField('adf-cloud-process-list', JSON.stringify(processListCloudConfigFile));
 
         await apiService.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
@@ -493,31 +410,6 @@ describe('Process list cloud', () => {
 
         beforeEach(async (done) => {
             await LocalStorageUtil.setConfigField('adf-edit-process-filter', JSON.stringify({
-                'filterProperties': [
-                    'appName',
-                    'status',
-                    'sort',
-                    'order',
-                    'processName',
-                    'lastModified',
-                    'processInstanceId',
-                    'initiator',
-                    'processDefinitionId',
-                    'processDefinitionKey',
-                    'startDate',
-                    'businessKey'
-                ],
-                'sortProperties': [
-                    'id',
-                    'name',
-                    'status',
-                    'startDate',
-                    'businessKey',
-                    'initiator',
-                    'processDefinitionId',
-                    'processDefinitionKey',
-                    'lastModified'
-                ],
                 'actions': [
                     'save',
                     'saveAs'
