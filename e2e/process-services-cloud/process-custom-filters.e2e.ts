@@ -19,7 +19,7 @@ import TestConfig = require('../test.config');
 
 import {
     TasksService, QueryService, ProcessDefinitionsService, ProcessInstancesService,
-    LoginSSOPage, ApiService, SettingsPage, StringUtil
+    LoginSSOPage, ApiService, SettingsPage, StringUtil, IdentityService, RolesService
 } from '@alfresco/adf-testing';
 import { NavigationBarPage } from '../pages/adf/navigationBarPage';
 import { ProcessCloudDemoPage } from '../pages/adf/demo-shell/process-services/processCloudDemoPage';
@@ -28,6 +28,7 @@ import { AppListCloudPage, LocalStorageUtil } from '@alfresco/adf-testing';
 import resources = require('../util/resources');
 
 import { browser, protractor } from 'protractor';
+import CONSTANTS = require('../util/constants');
 
 describe('Process list cloud', () => {
 
@@ -42,10 +43,14 @@ describe('Process list cloud', () => {
     let processDefinitionService: ProcessDefinitionsService;
     let processInstancesService: ProcessInstancesService;
     let queryService: QueryService;
+    let activitiUser, activitiUserRoleId;
 
     let completedProcess, runningProcessInstance, switchProcessInstance, noOfApps;
     const candidateuserapp = resources.ACTIVITI7_APPS.CANDIDATE_USER_APP.name;
 
+    const apiService = new ApiService('activiti', TestConfig.adf.hostBPM, TestConfig.adf.hostSso, 'BPM');
+    const identityService = new IdentityService(apiService);
+    const rolesService = new RolesService(apiService);
     beforeAll(async (done) => {
         settingsPage.setProviderBpmSso(TestConfig.adf.hostBPM, TestConfig.adf.hostSso, TestConfig.adf.hostIdentity, false);
         loginSSOPage.clickOnSSOButton();
@@ -146,7 +151,6 @@ describe('Process list cloud', () => {
             }
         }));
 
-        const apiService = new ApiService('activiti', TestConfig.adf.hostBPM, TestConfig.adf.hostSso, 'BPM');
         await apiService.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
 
         processDefinitionService = new ProcessDefinitionsService(apiService);
@@ -177,7 +181,25 @@ describe('Process list cloud', () => {
         tasksService = new TasksService(apiService);
         const claimedTask = await tasksService.claimTask(task.list.entries[0].entry.id, candidateuserapp);
         await tasksService.completeTask(claimedTask.entry.id, candidateuserapp);
+
+        activitiUser = await identityService.createIdentityUser();
+        activitiUserRoleId = await rolesService.getRoleIdByRoleName(CONSTANTS.ROLES.ACTIVITI_USER);
+        await identityService.assignRole(activitiUser.idIdentityService, activitiUserRoleId, CONSTANTS.ROLES.ACTIVITI_USER);
+        await apiService.login(activitiUser.email, activitiUser.password);
+
+        processInstancesService = new ProcessInstancesService(apiService);
+        await processInstancesService.createProcessInstance(processDefinition.list.entries[0].entry.key, candidateuserapp, {
+            'name': StringUtil.generateRandomString(5),
+            'businessKey': StringUtil.generateRandomString(5)
+        });
+
+        await apiService.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
         done();
+    });
+
+    afterAll(async () => {
+        console.log(JSON.stringify(activitiUser));
+        await identityService.deleteIdentityUser(activitiUser.idIdentityService);
     });
 
     describe('Process List', () => {
