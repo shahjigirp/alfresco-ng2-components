@@ -185,16 +185,12 @@ exports.config = {
     baseUrl: "http://" + HOST,
 
     params: {
-<<<<<<< Updated upstream
         rootPath: __dirname,
         config: {
             oauth2: {
                 clientId: 'activiti'
             }
         }
-=======
-        config: appConfig
->>>>>>> Stashed changes
     },
 
     framework: 'jasmine2',
