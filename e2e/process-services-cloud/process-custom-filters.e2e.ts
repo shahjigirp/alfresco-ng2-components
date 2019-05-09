@@ -198,7 +198,6 @@ describe('Process list cloud', () => {
     });
 
     afterAll(async () => {
-        console.log(JSON.stringify(activitiUser));
         await identityService.deleteIdentityUser(activitiUser.idIdentityService);
     });
 
