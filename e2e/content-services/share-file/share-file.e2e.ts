@@ -137,25 +137,6 @@ describe('Share file', () => {
             shareDialog.calendarTodayDayIsDisabled();
         });
 
-        it('[C286548] Should be possible to set expiry date for link', async () => {
-            contentListPage.selectRow(pngFileModel.name);
-            contentServicesPage.clickShareButton();
-            shareDialog.checkDialogIsDisplayed();
-            shareDialog.clickDateTimePickerButton();
-            shareDialog.setDefaultDay();
-            shareDialog.setDefaultHour();
-            shareDialog.setDefaultMinutes();
-            shareDialog.dateTimePickerDialogIsClosed();
-            const value = await shareDialog.getExpirationDate();
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
-            contentServicesPage.clickShareButton();
-            shareDialog.checkDialogIsDisplayed();
-            shareDialog.expirationDateInputHasValue(value);
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
-        });
-
         it('[C286578] Should disable today option in expiration day calendar', () => {
             contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
