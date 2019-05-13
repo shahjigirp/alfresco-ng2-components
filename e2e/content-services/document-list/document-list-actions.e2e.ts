@@ -16,7 +16,7 @@
  */
 
 import { browser, by, element } from 'protractor';
-import { LoginPage, PaginationPage, UploadActions } from '@alfresco/adf-testing';
+import { LoginPage, PaginationPage, UploadActions, StringUtil} from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
@@ -24,9 +24,13 @@ import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { FileModel } from '../../models/ACS/fileModel';
-import { StringUtil } from '@alfresco/adf-testing';
 import { Util } from '../../util/util';
 import { ContentNodeSelectorDialogPage } from '@alfresco/adf-testing';
+import { BreadCrumbDropdownPage } from '../../pages/adf/content-services/breadcrumb/breadCrumbDropdownPage';
+import { BreadCrumbPage } from '../../pages/adf/content-services/breadcrumb/breadCrumbPage';
+import { InfinitePaginationPage } from '../../pages/adf/core/infinitePaginationPage';
+import { FolderModel } from '../../models/ACS/folderModel';
+
 
 describe('Document List Component - Actions', () => {
 

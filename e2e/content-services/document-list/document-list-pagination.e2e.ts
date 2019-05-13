@@ -25,7 +25,7 @@ import { FolderModel } from '../../models/ACS/folderModel';
 
 import TestConfig = require('../../test.config');
 import { Util } from '../../util/util';
-
+import { browser } from 'protractor';
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 
 describe('Document List - Pagination', function () {

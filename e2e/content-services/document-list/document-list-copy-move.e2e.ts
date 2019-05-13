@@ -16,12 +16,11 @@
  */
 
 import { by, element } from 'protractor';
-import { LoginPage, PaginationPage } from '@alfresco/adf-testing';
+import { LoginPage, PaginationPage, UploadActions } from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import TestConfig = require('../../test.config');
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '../../actions/ACS/upload.actions';
 import { StringUtil } from '@alfresco/adf-testing';
 import { ContentNodeSelectorDialogPage } from '@alfresco/adf-testing';
 import { BreadCrumbDropdownPage } from '../../pages/adf/content-services/breadcrumb/breadCrumbDropdownPage';
@@ -38,13 +37,13 @@ describe('Document List Component - Actions', () => {
     const paginationPage = new PaginationPage();
     const breadCrumbDropdownPage = new BreadCrumbDropdownPage();
     const breadCrumbPage = new BreadCrumbPage();
-    const uploadActions = new UploadActions();
     const infinitePaginationPage = new InfinitePaginationPage(element(by.css('adf-content-node-selector')));
 
     const alfrescoJsApi = new AlfrescoApi({
         provider: 'ECM',
         hostEcm: TestConfig.adf.url
     });
+    const uploadActions = new UploadActions(alfrescoJsApi);
 
     describe('Folder Actions - Copy and Move', () => {
 
@@ -65,12 +64,12 @@ describe('Document List Component - Actions', () => {
             await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
             await alfrescoJsApi.core.peopleApi.addPerson(contentServicesUser);
             await alfrescoJsApi.login(contentServicesUser.id, contentServicesUser.password);
-            folder1 = await uploadActions.createFolder(alfrescoJsApi, 'A' + folderModel1.name, '-my-');
-            folder2 = await uploadActions.createFolder(alfrescoJsApi, 'B' + folderModel2.name, '-my-');
-            folder3 = await uploadActions.createFolder(alfrescoJsApi, 'C' + folderModel3.name, '-my-');
-            folder4 = await uploadActions.createFolder(alfrescoJsApi, 'D' + folderModel4.name, '-my-');
-            folder5 = await uploadActions.createFolder(alfrescoJsApi, 'E' + folderModel5.name, '-my-');
-            folder6 = await uploadActions.createFolder(alfrescoJsApi, 'F' + folderModel6.name, '-my-');
+            folder1 = await uploadActions.createFolder('A' + folderModel1.name, '-my-');
+            folder2 = await uploadActions.createFolder('B' + folderModel2.name, '-my-');
+            folder3 = await uploadActions.createFolder('C' + folderModel3.name, '-my-');
+            folder4 = await uploadActions.createFolder('D' + folderModel4.name, '-my-');
+            folder5 = await uploadActions.createFolder('E' + folderModel5.name, '-my-');
+            folder6 = await uploadActions.createFolder('F' + folderModel6.name, '-my-');
             folders = [folder1, folder2, folder3, folder4, folder5, folder6];
             done();
         });
@@ -88,7 +87,7 @@ describe('Document List Component - Actions', () => {
         afterAll(async (done) => {
             await alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
             await folders.forEach(function (folder) {
-                uploadActions.deleteFilesOrFolder(alfrescoJsApi, folder.entry.id);
+                uploadActions.deleteFileOrFolder(folder.entry.id);
             });
             done();
         });
