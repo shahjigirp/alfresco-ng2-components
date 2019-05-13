@@ -54,6 +54,7 @@ export class UserPreferencesService {
     }
 
     private initUserPreferenceStatus() {
+        this.initStoragePrefix();
         this.initUserLanguage();
         this.set(UserPreferenceValues.PaginationSize, this.paginationSize);
         this.set(UserPreferenceValues.SupportedPageSizes, JSON.stringify(this.supportedPageSizes));
@@ -65,6 +66,10 @@ export class UserPreferencesService {
         } else {
             this.setWithoutStore(UserPreferenceValues.Locale, (this.locale || this.getDefaultLocale()));
         }
+    }
+
+    private initStoragePrefix() {
+        this.storage.storagePrefix = this.appConfig.get<string>('application.storagePrefix', '');
     }
 
     /**

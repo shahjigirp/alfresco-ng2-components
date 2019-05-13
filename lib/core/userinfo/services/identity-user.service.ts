@@ -64,7 +64,7 @@ export class IdentityUserService {
      */
     getValueFromToken<T>(key: string): T {
         let value;
-        const token = this.storageService.getItem(IdentityUserService.USER_ACCESS_TOKEN);
+        const token = localStorage.getItem(IdentityUserService.USER_ACCESS_TOKEN);
         if (token) {
             const tokenPayload = this.helper.decodeToken(token);
             value = tokenPayload[key];
