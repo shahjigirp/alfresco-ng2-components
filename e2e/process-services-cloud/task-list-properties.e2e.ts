@@ -329,7 +329,7 @@ describe('Edit task filters and task list properties', () => {
             tasksCloudDemoPage.taskListCloudComponent().checkContentIsNotDisplayedByName(createdTask.entry.name);
         });
 
-        xit('[C297691] Task is not displayed when typing into lastModifiedFrom field a date before the task due date  ' +
+        it('[C297691] Task is not displayed when typing into lastModifiedFrom field a date before the task due date  ' +
             'and into lastModifiedTo a date before task due date', () => {
 
             tasksCloudDemoPage.myTasksFilter().checkTaskFilterIsDisplayed();
@@ -337,6 +337,7 @@ describe('Edit task filters and task list properties', () => {
 
             tasksCloudDemoPage.editTaskFilterCloudComponent().setLastModifiedFrom(beforeDate);
             tasksCloudDemoPage.editTaskFilterCloudComponent().setLastModifiedTo(beforeDate);
+            tasksCloudDemoPage.editTaskFilterCloudComponent().setTaskName(createdTask.entry.name);
             expect(tasksCloudDemoPage.taskListCloudComponent().getNoTasksFoundMessage()).toEqual(noTasksFoundMessage);
         });
 
@@ -348,6 +349,7 @@ describe('Edit task filters and task list properties', () => {
 
             tasksCloudDemoPage.editTaskFilterCloudComponent().setLastModifiedFrom(beforeDate);
             tasksCloudDemoPage.editTaskFilterCloudComponent().setLastModifiedTo(afterDate);
+            tasksCloudDemoPage.editTaskFilterCloudComponent().setTaskName(createdTask.entry.name);
             tasksCloudDemoPage.taskListCloudComponent().checkContentIsDisplayedByName(createdTask.entry.name);
         });
 
