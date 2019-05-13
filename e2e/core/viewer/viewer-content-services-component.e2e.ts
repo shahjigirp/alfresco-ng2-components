@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browser } from 'protractor';
+import { browsers } from 'protractor';
 
 import TestConfig = require('../../test.config');
 
@@ -173,14 +173,14 @@ describe('Content Services Viewer', () => {
         viewerPage.clearPageNumber();
         viewerPage.checkPageSelectorInputIsDisplayed('');
 
-        viewerPage.clickZoomOutButton();
+        viewerPage.clickZoomOutButtonForPdfs();
 
         zoom = viewerPage.getZoom();
-        viewerPage.clickZoomOutButton();
+        viewerPage.clickZoomOutButtonForPdfs();
         viewerPage.checkZoomedOut(zoom);
 
         zoom = viewerPage.getZoom();
-        viewerPage.clickZoomInButton();
+        viewerPage.clickZoomInButtonForPdfs();
         viewerPage.checkZoomedIn(zoom);
 
         viewerPage.clickCloseButton();
@@ -232,11 +232,11 @@ describe('Content Services Viewer', () => {
         viewerPage.checkPercentageIsDisplayed();
 
         zoom = viewerPage.getZoom();
-        viewerPage.clickZoomInButton();
+        viewerPage.clickZoomInButtonForImages();
         viewerPage.checkZoomedIn(zoom);
 
         zoom = viewerPage.getZoom();
-        viewerPage.clickZoomOutButton();
+        viewerPage.clickZoomOutButtonforImages();
         viewerPage.checkZoomedOut(zoom);
 
         viewerPage.clickRotateLeftButton();
