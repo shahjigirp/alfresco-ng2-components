@@ -17,7 +17,7 @@
 
 import { browser } from 'protractor';
 
-import { LoginPage, LocalStorageUtil, UploadActions } from '@alfresco/adf-testing';
+import { LoginPage, LocalStorageUtil, UploadActions, BrowserActions } from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import { MetadataViewPage } from '../../pages/adf/metadataViewPage';

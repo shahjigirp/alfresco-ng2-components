@@ -16,7 +16,7 @@
  */
 
 import { browser, by, element } from 'protractor';
-import { LoginPage, PaginationPage, UploadActions, StringUtil} from '@alfresco/adf-testing';
+import { LoginPage, PaginationPage, UploadActions, StringUtil } from '@alfresco/adf-testing';
 import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
@@ -30,7 +30,6 @@ import { BreadCrumbDropdownPage } from '../../pages/adf/content-services/breadcr
 import { BreadCrumbPage } from '../../pages/adf/content-services/breadcrumb/breadCrumbPage';
 import { InfinitePaginationPage } from '../../pages/adf/core/infinitePaginationPage';
 import { FolderModel } from '../../models/ACS/folderModel';
-
 
 describe('Document List Component - Actions', () => {
 

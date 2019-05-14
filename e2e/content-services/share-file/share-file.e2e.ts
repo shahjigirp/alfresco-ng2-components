@@ -20,14 +20,17 @@ import { ContentServicesPage } from '../../pages/adf/contentServicesPage';
 import { NavigationBarPage } from '../../pages/adf/navigationBarPage';
 import { ViewerPage } from '../../pages/adf/viewerPage';
 import { ShareDialog } from '../../pages/adf/dialog/shareDialog';
+
 import { AcsUserModel } from '../../models/ACS/acsUserModel';
 import { FileModel } from '../../models/ACS/fileModel';
+
 import TestConfig = require('../../test.config');
 import resources = require('../../util/resources');
+
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { browser } from 'protractor';
 
 describe('Share file', () => {
+
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const contentListPage = contentServicesPage.getDocumentList();
@@ -35,94 +38,77 @@ describe('Share file', () => {
     const navigationBarPage = new NavigationBarPage();
     const viewerPage = new ViewerPage();
     const acsUser = new AcsUserModel();
+
     const pngFileModel = new FileModel({
         'name': resources.Files.ADF_DOCUMENTS.PNG.file_name,
         'location': resources.Files.ADF_DOCUMENTS.PNG.file_location
     });
+    this.alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
+    const uploadActions = new UploadActions(this.alfrescoJsApi);
 
-    let nodeId, uploadActions;
+    let nodeId;
 
     beforeAll(async (done) => {
-        this.alfrescoJsApi = new AlfrescoApi({
-            provider: 'ECM',
-            hostEcm: TestConfig.adf.url
-        });
-        uploadActions = new UploadActions(this.alfrescoJsApi);
+
         await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
-
         await this.alfrescoJsApi.core.peopleApi.addPerson(acsUser);
-
         await this.alfrescoJsApi.login(acsUser.id, acsUser.password);
 
         const pngUploadedFile = await uploadActions.uploadFile(pngFileModel.location, pngFileModel.name, '-my-');
 
         nodeId = pngUploadedFile.entry.id;
 
-        loginPage.loginToContentServicesUsingUserModel(acsUser);
+        await loginPage.loginToContentServicesUsingUserModel(acsUser);
 
         navigationBarPage.clickContentServicesButton();
+
+        contentServicesPage.waitForTableBody();
 
         done();
     });
 
     afterAll(async (done) => {
-        await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
-        await uploadActions.deleteFileOrFolder(nodeId);
+        try {
+            await this.alfrescoJsApi.login(TestConfig.adf.adminEmail, TestConfig.adf.adminPassword);
+            await uploadActions.deleteFileOrFolder(nodeId);
+        } catch (error) {
+        }
         done();
     });
 
     describe('Shared link dialog', () => {
 
-        beforeAll(async (done) => {
-
-            loginPage.loginToContentServicesUsingUserModel(acsUser);
-
-            navigationBarPage.clickContentServicesButton();
-
-            contentServicesPage.waitForTableBody();
-
-            done();
+        beforeAll(() => {
+            contentListPage.selectRow(pngFileModel.name);
         });
 
-        afterEach(async (done) => {
-            await browser.refresh();
-            contentServicesPage.waitForTableBody();
-            done();
+        afterEach(() => {
+            BrowserActions.closeMenuAndDialogs();
         });
 
         it('[C286549] Should check automatically toggle button in Share dialog', () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.shareToggleButtonIsChecked();
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
         });
 
         it('[C286544] Should display notification when clicking URL copy button', () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.clickShareLinkButton();
             shareDialog.checkNotificationWithMessage('Link copied to the clipboard');
-            shareDialog.waitForNotificationToClose();
-            shareDialog.clickShareLinkButton();
-            shareDialog.checkNotificationWithMessage('Link copied to the clipboard');
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
         });
 
         it('[C286543] Should be possible to close Share dialog', () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.checkShareLinkIsDisplayed();
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
         });
 
         it('[C286578] Should disable today option in expiration day calendar', () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.clickDateTimePickerButton();
@@ -130,7 +116,6 @@ describe('Share file', () => {
         });
 
         it('[C286548] Should be possible to set expiry date for link', async () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.clickDateTimePickerButton();
@@ -144,12 +129,10 @@ describe('Share file', () => {
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.expirationDateInputHasValue(value);
-            shareDialog.clickCloseButton();
-            shareDialog.dialogIsClosed();
+            BrowserActions.closeMenuAndDialogs();
         });
 
         it('[C286578] Should disable today option in expiration day calendar', () => {
-            contentListPage.selectRow(pngFileModel.name);
             contentServicesPage.clickShareButton();
             shareDialog.checkDialogIsDisplayed();
             shareDialog.clickDateTimePickerButton();
@@ -165,11 +148,9 @@ describe('Share file', () => {
         });
 
         beforeAll(async (done) => {
-
             loginPage.loginToContentServicesUsingUserModel(acsUser);
 
             navigationBarPage.clickContentServicesButton();
-
             contentServicesPage.waitForTableBody();
 
             done();
@@ -182,7 +163,7 @@ describe('Share file', () => {
             shareDialog.clickShareLinkButton();
             shareDialog.checkNotificationWithMessage('Link copied to the clipboard');
             const sharedLink = await shareDialog.getShareLink();
-            browser.get(sharedLink);
+            BrowserActions.getUrl(sharedLink);
             viewerPage.checkFileNameIsDisplayed(pngFileModel.name);
         });
 
@@ -200,7 +181,7 @@ describe('Share file', () => {
             shareDialog.checkNotificationWithMessage('Link copied to the clipboard');
             const secondSharedLink = await shareDialog.getShareLink();
             expect(sharedLink).toEqual(secondSharedLink);
-            browser.get(sharedLink);
+            BrowserActions.getUrl(sharedLink);
             viewerPage.checkFileNameIsDisplayed(pngFileModel.name);
         });
 
@@ -212,7 +193,7 @@ describe('Share file', () => {
             const sharedLink = await shareDialog.getShareLink();
             shareDialog.clickCloseButton();
             navigationBarPage.clickLogoutButton();
-            browser.get(sharedLink);
+            BrowserActions.getUrl(sharedLink);
             viewerPage.checkFileNameIsDisplayed(pngFileModel.name);
         });
     });

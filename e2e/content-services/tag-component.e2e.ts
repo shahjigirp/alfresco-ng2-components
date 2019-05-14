@@ -20,7 +20,7 @@ import { FileModel } from '../models/ACS/fileModel';
 
 import { LoginPage, UploadActions } from '@alfresco/adf-testing';
 import { TagPage } from '../pages/adf/tagPage';
-import { AppNavigationBarPage } from '../pages/adf/process-services/appNavigationBarPage';
+import { NavigationBarPage } from '../pages/adf/navigationBarPage';
 
 import TestConfig = require('../test.config');
 import resources = require('../util/resources');
@@ -34,7 +34,7 @@ describe('Tag component', () => {
 
     const loginPage = new LoginPage();
     const tagPage = new TagPage();
-    const appNavigationBarPage = new AppNavigationBarPage();
+    const appNavigationBarPage = new NavigationBarPage();
     const acsUser = new AcsUserModel();
     const pdfFileModel = new FileModel({ 'name': resources.Files.ADF_DOCUMENTS.PDF.file_name });
     const deleteFile = new FileModel({ 'name': StringUtil.generateRandomString() });
