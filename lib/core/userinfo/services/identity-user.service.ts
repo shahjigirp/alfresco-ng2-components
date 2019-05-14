@@ -24,7 +24,6 @@ import { JwtHelperService } from '../../services/jwt-helper.service';
 import { AppConfigService } from '../../app-config/app-config.service';
 import { AlfrescoApiService } from '../../services/alfresco-api.service';
 import { IdentityRoleModel } from '../models/identity-role.model';
-import { StorageService } from '../../services/storage.service';
 
 @Injectable({
     providedIn: 'root'
@@ -41,8 +40,7 @@ export class IdentityUserService {
     constructor(
         private helper: JwtHelperService,
         private apiService: AlfrescoApiService,
-        private appConfigService: AppConfigService,
-        private storageService: StorageService) { }
+        private appConfigService: AppConfigService) { }
 
     /**
      * Gets the name and other basic details of the current user.
