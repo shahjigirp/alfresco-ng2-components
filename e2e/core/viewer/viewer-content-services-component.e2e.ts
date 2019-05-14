@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-import { browsers } from 'protractor';
-
 import TestConfig = require('../../test.config');
 
 import { LoginPage } from '@alfresco/adf-testing';
@@ -30,6 +28,7 @@ import { AcsUserModel } from '../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
 import { UploadActions } from '../../actions/ACS/upload.actions';
+import { browser } from 'protractor';
 
 describe('Content Services Viewer', () => {
 
