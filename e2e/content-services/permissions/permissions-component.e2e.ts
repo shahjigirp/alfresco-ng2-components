@@ -34,18 +34,17 @@ import { UploadDialog } from '../../pages/adf/dialog/uploadDialog';
 
 describe('Permissions Component', function () {
 
-    this.alfrescoJsApi = new AlfrescoApi({
-        provider: 'ECM',
-        hostEcm: TestConfig.adf.url
-    });
     const loginPage = new LoginPage();
     const contentServicesPage = new ContentServicesPage();
     const permissionsPage = new PermissionsPage();
     const navigationBarPage = new NavigationBarPage();
+    this.alfrescoJsApi = new AlfrescoApi({
+        provider: 'ECM',
+        hostEcm: TestConfig.adf.url
+    });
     const uploadActions = new UploadActions(this.alfrescoJsApi);
 
     const contentList = contentServicesPage.getDocumentList();
-
     const viewerPage = new ViewerPage();
     const metadataViewPage = new MetadataViewPage();
     const notificationPage = new NotificationPage();
@@ -178,7 +177,7 @@ describe('Permissions Component', function () {
         done();
     });
 
-    describe('Inherit and assigning permissions', function () {
+    describe('Inherit and assigning permissions', () =>  {
 
         beforeEach(async (done) => {
 
@@ -291,7 +290,7 @@ describe('Permissions Component', function () {
 
     });
 
-    describe('Changing and duplicate Permissions', function () {
+    describe('Changing and duplicate Permissions', () =>  {
 
         beforeEach(async (done) => {
 
@@ -409,7 +408,7 @@ describe('Permissions Component', function () {
 
     });
 
-    describe('Role: Consumer, Contributor, Coordinator, Collaborator, Editor, No Permissions', function () {
+    describe('Role: Consumer, Contributor, Coordinator, Collaborator, Editor, No Permissions', () => {
 
         it('[C276993] Role Consumer', () => {
 

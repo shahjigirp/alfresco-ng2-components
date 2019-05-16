@@ -16,7 +16,7 @@
  */
 
 import { TestConfig } from '../../../../e2e/test.config.js';
-import { LoginPage } from '@alfresco/adf-testing';
+import { LoginPage, UploadActions  } from '@alfresco/adf-testing';
 import { ViewerPage } from '../../../pages/adf/viewerPage';
 import { ContentServicesPage } from '../../../pages/adf/contentServicesPage';
 
@@ -28,7 +28,6 @@ import { FolderModel } from '../../../models/ACS/folderModel';
 import { AcsUserModel } from '../../../models/ACS/acsUserModel';
 
 import { AlfrescoApiCompatibility as AlfrescoApi } from '@alfresco/js-api';
-import { UploadActions } from '@alfresco/adf-testing';
 
 describe('Viewer', () => {
 
